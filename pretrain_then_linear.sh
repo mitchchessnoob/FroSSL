@@ -6,11 +6,9 @@ fi
 
 EXPERIMENT_NAME="$1"
 DATASET="${2:-stl10}"  #second argument is dataset, default is stl10
-CONFIG_NAME="${3:-searmse.yaml}" #third argument is dataset, default is searmse
+CONFIG_NAME="${3:-searmse.yaml}" #third argument is method, default is searmse
 NUM_AUGMENTATIONS="$4"
 BACKBONE="resnet18"
-
-
 
 if [ "$DATASET" == "cifar10" ] || [ "$DATASET" == "cifar100" ]; then
     dataset_config_name="cifar"
@@ -18,7 +16,14 @@ else
     dataset_config_name="$DATASET"
 fi
 
-PRETRAIN_CONFIG_PATH="scripts/pretrain/$dataset_config_name"
+
+if [ "$EXPERIMENT_NAME" == "frossl-cifar10-multicrop" ]; then
+  PRETRAIN_CONFIG_PATH="scripts/pretrain/cifar-multicrop"
+
+else
+  PRETRAIN_CONFIG_PATH="scripts/pretrain/$dataset_config_name"
+fi
+
 LINEAR_CONFIG_PATH="scripts/pretrain/$dataset_config_name"
 
 echo "Preparing to start experiment with name $EXPERIMENT_NAME"
