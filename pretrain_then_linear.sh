@@ -19,12 +19,11 @@ fi
 
 if [ "$EXPERIMENT_NAME" == "frossl-cifar10-multicrop" ]; then
   PRETRAIN_CONFIG_PATH="scripts/pretrain/cifar-multicrop"
-
 else
   PRETRAIN_CONFIG_PATH="scripts/pretrain/$dataset_config_name"
 fi
 
-LINEAR_CONFIG_PATH="scripts/pretrain/$dataset_config_name"
+LINEAR_CONFIG_PATH="scripts/linear/$dataset_config_name"
 
 echo "Preparing to start experiment with name $EXPERIMENT_NAME"
 echo "on dataset $DATASET"
