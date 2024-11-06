@@ -11,7 +11,7 @@ hydra:
   run:
     dir: .
 
-name: "frossl-cifar10" # change here for cifar100
+name: "frossl-cifar10-multicrop" # change here for cifar100
 method: "frossl"
 backbone:
   name: "resnet18"
