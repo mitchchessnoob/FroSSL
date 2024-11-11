@@ -210,6 +210,8 @@ def build_transform_pipeline(dataset, cfg):
         "imagenet100": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "imagenet": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        "EuroSAT2" : ((1354.,  1115.4, 1033.3,  934.8, 1180.5, 1964.9, 2326.8, 2254.5, 1780.3, 1098.),
+                      ( 64.2, 150.7, 183.8, 272.3, 223.1, 348.6, 445.5, 519.4, 370.3, 296.9))
     }
 
     mean, std = MEANS_N_STD.get(
