@@ -76,7 +76,25 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     Returns:
         Tuple[nn.Module, nn.Module]: training and validation transformation pipelines.
     """
-
+    EuroSAT_pipeline = {        #modify!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        "T_train": transforms.Compose(
+            [
+                transforms.RandomResizedCrop(size=64, scale=(0.08, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize((0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465,0.4914),
+                                     (0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247)),
+            ]
+        ),
+        "T_val": transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize((0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465,0.4914),
+                                     (0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247)),
+            ]
+        ),
+    }
+    
     cifar_pipeline = {
         "T_train": transforms.Compose(
             [
@@ -152,6 +170,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     custom_pipeline = build_custom_pipeline()
 
     pipelines = {
+        "EuroSAT" : EuroSAT_pipeline,
         "cifar10": cifar_pipeline,
         "cifar100": cifar_pipeline,
         "stl10": stl_pipeline,
@@ -207,8 +226,23 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         val_data_path = sandbox_folder / "datasets"
 
-    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom"]
+    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "EuroSAT"]
+    
+    if dataset in ["EuroSAT"]: #modify!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        DatasetClass = vars(torchvision.datasets)[dataset.upper()]
+        train_dataset = DatasetClass(
+            train_data_path,
+            train=True,
+            download=download,
+            transform=T_train,
+        )
 
+        val_dataset = DatasetClass(
+            val_data_path,
+            train=False,
+            download=download,
+            transform=T_val,
+        )
     if dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
         train_dataset = DatasetClass(
