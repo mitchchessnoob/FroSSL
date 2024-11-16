@@ -31,6 +31,7 @@ import tqdm
 from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
 from torchvision.datasets import STL10, ImageFolder, EuroSAT
+from datasets import load_dataset
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -159,7 +160,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         "imagenet": imagenet_pipeline,
         "tiny-imagenet": tiny_imagenet_pipeline,
         "custom": custom_pipeline,
-        "eurosat": cifar_pipeline #hh
+        "eurosat_rgb": cifar_pipeline #hh
     }
 
     assert dataset in pipelines
@@ -169,6 +170,11 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     T_val = pipeline["T_val"]
 
     return T_train, T_val
+
+
+def apply_transformation(example, transformation): # for huggingface dataset
+    example["image"] = transformation(example["image"])
+    return example
 
 
 def prepare_datasets(
@@ -208,7 +214,7 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         val_data_path = sandbox_folder / "datasets"
 
-    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat"]
+    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat_rgb"]
 
     if dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
@@ -240,7 +246,23 @@ def prepare_datasets(
             transform=T_val,
         )
 
-    elif dataset == "eurosat":
+    elif dataset[:7] == "eurosat":
+        if dataset[7:] == "_rgb":
+            train_dataset = load_dataset("blanchon/EuroSAT_RGB", split="train")
+            val_dataset = load_dataset("blanchon/EuroSAT_RGB", split="validation")
+        elif dataset[7:] == "_msi":
+            train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
+            val_dataset = load_dataset("blanchon/EuroSAT_MSI", split="validation")
+        else:
+            pass
+        #train_dataset.set_format("torch", columns=["image", "label"])
+        #val_dataset.set_format("torch", columns=["image", "label"])
+
+        train_dataset = train_dataset.map(lambda x: apply_transformation(x, T_train), batched=False)
+        val_dataset = val_dataset.map(lambda x: apply_transformation(x, T_val), batched=False)
+
+
+    elif dataset == "eurosat": # old pipeline for torch dataset!!
         dataset_size = 27_000
         train_size = int(0.7 * dataset_size) 
 

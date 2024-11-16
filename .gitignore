@@ -21,6 +21,7 @@ datasets
 *.tar
 *.pkl
 last_ckpt.txt
+tests.ipynb
 
 bash_files/*.png
 bash_files/*.jpg

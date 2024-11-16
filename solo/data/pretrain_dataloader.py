@@ -31,6 +31,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Dataset, Subset
 from torchvision import transforms
 from torchvision.datasets import STL10, ImageFolder, EuroSAT
+from datasets import load_dataset
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -56,6 +57,29 @@ def dataset_with_index(DatasetClass: Type[Dataset]) -> Type[Dataset]:
             return (index, *data)
 
     return DatasetWithIndex
+
+def hugging_to_dataset_with_index() -> Type[Dataset]:
+    """Factory for datasets that also returns the data index.
+
+    Args:
+        DatasetClass (Type[Dataset]): Dataset class to be wrapped.
+
+    Returns:
+        Type[Dataset]: dataset with index.
+    """
+
+    class HuggingFaceDatasetWrapper(Dataset):
+        def __init__(self, hf_dataset):
+            self.hf_dataset = hf_dataset
+
+        def __len__(self):
+            return len(self.hf_dataset)
+
+        def __getitem__(self, idx):
+            item = self.hf_dataset[idx]
+            return (idx, *item)
+
+    return HuggingFaceDatasetWrapper
 
 
 class CustomDatasetWithoutLabels(Dataset):
@@ -337,6 +361,21 @@ def prepare_datasets(
             download=download,
             transform=transform,
         )
+        
+    elif dataset[:7] == "eurosat":
+        if dataset[7:] == "_rgb":
+            train_dataset = load_dataset("blanchon/EuroSAT_RGB", split="train")
+        elif dataset[7:] == "_msi":
+            train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
+        else:
+            pass
+        #train_dataset.set_format("torch", columns=["image", "label"])
+        #val_dataset.set_format("torch", columns=["image", "label"])
+        def apply_transformation(example, transformation): # for huggingface dataset
+            example["image"] = transformation(example["image"])
+            return example
+
+        train_dataset = hugging_to_dataset_with_index()(train_dataset.map(lambda x: apply_transformation(x, transform), batched=False))
 
     elif dataset == "eurosat":
         dataset_size = 27_000
