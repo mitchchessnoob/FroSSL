@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - augmentations: sym.yaml
+  - augmentations: symmetric.yaml
   - wandb: private.yaml
   - override hydra/hydra_logging: disabled
   - override hydra/job_logging: disabled
@@ -11,7 +11,7 @@ hydra:
   run:
     dir: .
 
-name: "EuroSAT" # change here for cifar100
+name: "frossl-eurosat" # change here for cifar100
 method: "frossl"
 backbone:
   name: "resnet18"
@@ -23,11 +23,11 @@ method_kwargs:
   invariance_weight: 1.0
 
 data:
-  dataset: EuroSAT # change here for cifar100
+  dataset: eurosat # change here for cifar100
   train_path: "./datasets"
   val_path: "./datasets"
   format: "image_folder"
-  num_workers: 2 #original was 8
+  num_workers: 8
 optimizer:
   name: "lars"
   batch_size: 256
@@ -48,9 +48,9 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-max_epochs: 5
+max_epochs: 10 #changed
 devices: [0]
 sync_batchnorm: True
-accelerator: "gpu"
+accelerator: "gpu" #changed
 strategy: "ddp"
 precision: 32

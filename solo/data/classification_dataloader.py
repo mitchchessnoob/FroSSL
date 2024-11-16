@@ -28,9 +28,9 @@ from torch import nn
 import torch
 import numpy as np
 import tqdm
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
-from torchvision.datasets import STL10, ImageFolder
+from torchvision.datasets import STL10, ImageFolder, EuroSAT
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -76,25 +76,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     Returns:
         Tuple[nn.Module, nn.Module]: training and validation transformation pipelines.
     """
-    EuroSAT_pipeline = {        #modify!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        "T_train": transforms.Compose(
-            [
-                transforms.RandomResizedCrop(size=64, scale=(0.08, 1.0)),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                transforms.Normalize((0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465,0.4914),
-                                     (0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247)),
-            ]
-        ),
-        "T_val": transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Normalize((0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465,0.4914),
-                                     (0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247)),
-            ]
-        ),
-    }
-    
+
     cifar_pipeline = {
         "T_train": transforms.Compose(
             [
@@ -170,7 +152,6 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     custom_pipeline = build_custom_pipeline()
 
     pipelines = {
-        "EuroSAT" : EuroSAT_pipeline,
         "cifar10": cifar_pipeline,
         "cifar100": cifar_pipeline,
         "stl10": stl_pipeline,
@@ -178,6 +159,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         "imagenet": imagenet_pipeline,
         "tiny-imagenet": tiny_imagenet_pipeline,
         "custom": custom_pipeline,
+        "eurosat": cifar_pipeline #hh
     }
 
     assert dataset in pipelines
@@ -226,23 +208,8 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         val_data_path = sandbox_folder / "datasets"
 
-    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "EuroSAT"]
-    
-    if dataset in ["EuroSAT"]: #modify!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        DatasetClass = vars(torchvision.datasets)[dataset.upper()]
-        train_dataset = DatasetClass(
-            train_data_path,
-            train=True,
-            download=download,
-            transform=T_train,
-        )
+    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat"]
 
-        val_dataset = DatasetClass(
-            val_data_path,
-            train=False,
-            download=download,
-            transform=T_val,
-        )
     if dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
         train_dataset = DatasetClass(
@@ -272,6 +239,19 @@ def prepare_datasets(
             download=download,
             transform=T_val,
         )
+
+    elif dataset == "eurosat":
+        dataset_size = 27_000
+        train_size = int(0.7 * dataset_size) 
+
+        indices = list(range(dataset_size))
+        np.random.seed(72)
+        np.random.shuffle(indices)
+        train_indices = indices[:train_size]
+        val_indices = indices[train_size:]
+        # different transformations!
+        train_dataset = Subset(EuroSAT(root="datasets", transform=T_train, download=True), train_indices)
+        val_dataset = Subset(EuroSAT(root="datasets", transform=T_val), val_indices)
 
     elif dataset in ["imagenet", "imagenet100", "custom", "tiny-imagenet"]:
         if data_format == "h5":

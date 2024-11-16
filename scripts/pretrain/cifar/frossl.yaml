@@ -27,7 +27,7 @@ data:
   train_path: "./datasets"
   val_path: "./datasets"
   format: "image_folder"
-  num_workers: 2 #original was 8
+  num_workers: 8
 optimizer:
   name: "lars"
   batch_size: 256
@@ -48,9 +48,9 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-max_epochs: 1000
+max_epochs: 10 #changed
 devices: [0]
 sync_batchnorm: True
-accelerator: "gpu"
+accelerator: "auto" #changed
 strategy: "ddp"
 precision: 32

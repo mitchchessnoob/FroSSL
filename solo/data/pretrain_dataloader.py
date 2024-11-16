@@ -19,6 +19,7 @@
 
 import os
 import random
+import numpy as np
 from pathlib import Path
 from typing import Callable, List, Optional, Sequence, Type, Union
 
@@ -27,9 +28,9 @@ import torchvision
 from PIL import Image, ImageFilter, ImageOps
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torch.utils.data import DataLoader
-from torch.utils.data.dataset import Dataset
+from torch.utils.data.dataset import Dataset, Subset
 from torchvision import transforms
-from torchvision.datasets import STL10, ImageFolder
+from torchvision.datasets import STL10, ImageFolder, EuroSAT
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -210,8 +211,6 @@ def build_transform_pipeline(dataset, cfg):
         "imagenet100": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "imagenet": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        "EuroSAT2" : ((1354.,  1115.4, 1033.3,  934.8, 1180.5, 1964.9, 2326.8, 2254.5, 1780.3, 1098.),
-                      ( 64.2, 150.7, 183.8, 272.3, 223.1, 348.6, 445.5, 519.4, 370.3, 296.9))
     }
 
     mean, std = MEANS_N_STD.get(
@@ -339,6 +338,18 @@ def prepare_datasets(
             transform=transform,
         )
 
+    elif dataset == "eurosat":
+        dataset_size = 27_000
+        train_size = int(0.7 * dataset_size) 
+
+        indices = list(range(dataset_size))
+        np.random.seed(72)
+        np.random.shuffle(indices)
+        train_indices = indices[:train_size]
+    	
+        #train_dataset = Subset(EuroSAT(root="datasets", transform=transform, download=True), train_indices)
+        train_dataset = Subset(dataset_with_index(EuroSAT)(root="datasets", transform=transform, download=True), train_indices)
+
     elif dataset in ["imagenet", "imagenet100", "tiny-imagenet"]:
         if data_format == "h5":
             assert _h5_available
@@ -388,11 +399,11 @@ def prepare_dataloader(
     Returns:
         DataLoader: the training dataloader with the desired dataset.
     """
-
+    print(type(train_dataset))
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
-        shuffle=shuffle,
+        shuffle=shuffle, #TODO causes weird error
         num_workers=num_workers,
         pin_memory=True,
         drop_last=True,
