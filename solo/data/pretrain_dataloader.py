@@ -58,7 +58,7 @@ def dataset_with_index(DatasetClass: Type[Dataset]) -> Type[Dataset]:
 
     return DatasetWithIndex
 
-def hugging_to_dataset_with_index() -> Type[Dataset]:
+def eurosatdataset_with_index() -> Type[Dataset]:
     """Factory for datasets that also returns the data index.
 
     Args:
@@ -68,18 +68,24 @@ def hugging_to_dataset_with_index() -> Type[Dataset]:
         Type[Dataset]: dataset with index.
     """
 
-    class HuggingFaceDatasetWrapper(Dataset):
-        def __init__(self, hf_dataset):
+    class EuroSATDatasetWithIndex(Dataset):
+        def __init__(self, hf_dataset, transform=None):
             self.hf_dataset = hf_dataset
+            self.transform = transform
 
         def __len__(self):
             return len(self.hf_dataset)
 
         def __getitem__(self, idx):
             item = self.hf_dataset[idx]
-            return (idx, *item)
+            image = item["image"]
+            label = item["label"]
+            
+            if self.transform:
+                image = self.transform(image)
+            return (idx, image, label)
 
-    return HuggingFaceDatasetWrapper
+    return EuroSATDatasetWithIndex
 
 
 class CustomDatasetWithoutLabels(Dataset):
@@ -235,6 +241,9 @@ def build_transform_pipeline(dataset, cfg):
         "imagenet100": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "imagenet": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        "eurosat_rgb": ((0.3127, 0.3451, 0.3703), (0.1914, 0.1270, 0.1067)),
+        "eurosat_msi": ((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
+                        (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232))
     }
 
     mean, std = MEANS_N_STD.get(
@@ -288,7 +297,12 @@ def build_transform_pipeline(dataset, cfg):
     if cfg.horizontal_flip.prob:
         augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
 
-    augmentations.append(transforms.ToTensor())
+    if dataset[-3:] =="msi": # not an image!
+        augmentations.append(transforms.Lambda(lambda x: x.tensor(x, dtype=torch.float32).permute(2, 0, 1)))
+        augmentations.append(transforms.Lambda(lambda x: x/10_000))
+    else:
+        augmentations.append(transforms.ToTensor())
+
     augmentations.append(transforms.Normalize(mean=mean, std=std))
 
     augmentations = transforms.Compose(augmentations)
@@ -369,13 +383,8 @@ def prepare_datasets(
             train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
         else:
             pass
-        #train_dataset.set_format("torch", columns=["image", "label"])
-        #val_dataset.set_format("torch", columns=["image", "label"])
-        def apply_transformation(example, transformation): # for huggingface dataset
-            example["image"] = transformation(example["image"])
-            return example
 
-        train_dataset = hugging_to_dataset_with_index()(train_dataset.map(lambda x: apply_transformation(x, transform), batched=False))
+        train_dataset = eurosatdataset_with_index()(train_dataset, transform)
 
     elif dataset == "eurosat":
         dataset_size = 27_000
@@ -404,7 +413,7 @@ def prepare_datasets(
 
         train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
 
-    if data_fraction > 0:
+    if data_fraction > 0: #TODO adapt for eurosat
         assert data_fraction < 1, "Only use data_fraction for values smaller than 1."
         from sklearn.model_selection import train_test_split
 

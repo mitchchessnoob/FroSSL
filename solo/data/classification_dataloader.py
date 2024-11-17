@@ -41,6 +41,25 @@ else:
     _h5_available = True
 
 
+class EuroSATDataset(Dataset):
+    def __init__(self, hf_dataset, transform=None):
+        self.dataset = hf_dataset
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        image = item["image"]
+        label = item["label"]
+        
+        if self.transform:
+            image = self.transform(image)
+        
+        return image, label
+
+
 def build_custom_pipeline():
     """Builds augmentation pipelines for custom data.
     If you want to do exoteric augmentations, you can just re-write this function.
@@ -150,6 +169,44 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         ),
     }
 
+    eurosat_rgb_pipeline = {
+        "T_train": transforms.Compose(
+            [
+                transforms.RandomResizedCrop(size=64, scale=(0.08, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip(),
+                transforms.ToTensor(), # [0, 255] -> [0, 1] !!
+                transforms.Normalize((0.3127, 0.3451, 0.3703), (0.1914, 0.1270, 0.1067)), # (data["image"].float()/255).mean(dim=(0, 2, 3))
+            ]
+        ),
+        "T_val": transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize((0.3127, 0.3451, 0.3703), (0.1914, 0.1270, 0.1067)),
+            ]
+        ),
+    }
+
+    eurosat_msi_pipeline = {
+        "T_train": transforms.Compose(
+            [   transforms.Lambda(lambda x: x.tensor(x, dtype=torch.float32).permute(2, 0, 1)),
+                transforms.Lambda(lambda x: x/10_000),
+                transforms.RandomResizedCrop(size=64, scale=(0.08, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip(),
+                transforms.Normalize((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594), # (data["image"].float()/10_000).mean(dim=(0, 2, 3))
+                                     (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)), 
+            ]
+        ),
+        "T_val": transforms.Compose(
+            [   transforms.Lambda(lambda x: x.tensor(x, dtype=torch.float32).permute(2, 0, 1)),
+                transforms.Lambda(lambda x: x/10_000),
+                transforms.Normalize((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
+                                     (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)),
+            ]
+        ),
+    }
+
     custom_pipeline = build_custom_pipeline()
 
     pipelines = {
@@ -160,7 +217,8 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         "imagenet": imagenet_pipeline,
         "tiny-imagenet": tiny_imagenet_pipeline,
         "custom": custom_pipeline,
-        "eurosat_rgb": cifar_pipeline #hh
+        "eurosat_rgb": eurosat_rgb_pipeline,
+        "eurosat_msi": eurosat_msi_pipeline
     }
 
     assert dataset in pipelines
@@ -214,7 +272,7 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         val_data_path = sandbox_folder / "datasets"
 
-    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat_rgb"]
+    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat_rgb", "eurosat_msi"]
 
     if dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
@@ -258,8 +316,14 @@ def prepare_datasets(
         #train_dataset.set_format("torch", columns=["image", "label"])
         #val_dataset.set_format("torch", columns=["image", "label"])
 
-        train_dataset = train_dataset.map(lambda x: apply_transformation(x, T_train), batched=False)
-        val_dataset = val_dataset.map(lambda x: apply_transformation(x, T_val), batched=False)
+        # train_dataset = train_dataset.map(lambda x: apply_transformation(x, T_train), batched=False)
+        # val_dataset = val_dataset.map(lambda x: apply_transformation(x, T_val), batched=False)
+
+        # transform into a torch Dataset
+        train_dataset = EuroSATDataset(train_dataset, transform=T_train)
+        val_dataset = EuroSATDataset(val_dataset, transform=T_val)
+
+
 
 
     elif dataset == "eurosat": # old pipeline for torch dataset!!

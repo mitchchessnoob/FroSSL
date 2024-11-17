@@ -39,7 +39,8 @@ _SUPPORTED_DATASETS = [
     "imagenet100",
     "tiny-imagenet",
     "custom",
-    "eurosat_rgb"
+    "eurosat_rgb",
+    "eurosat_msi"
 ]
 
 
