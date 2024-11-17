@@ -187,9 +187,11 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         ),
     }
 
+
+
     eurosat_msi_pipeline = {
         "T_train": transforms.Compose(
-            [   transforms.Lambda(lambda x: x.tensor(x, dtype=torch.float32).permute(2, 0, 1)),
+            [   transforms.Lambda(lambda x: x.permute(2, 0, 1)),
                 transforms.Lambda(lambda x: x/10_000),
                 transforms.RandomResizedCrop(size=64, scale=(0.08, 1.0)),
                 transforms.RandomHorizontalFlip(),
@@ -199,7 +201,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
             ]
         ),
         "T_val": transforms.Compose(
-            [   transforms.Lambda(lambda x: x.tensor(x, dtype=torch.float32).permute(2, 0, 1)),
+            [   transforms.Lambda(lambda x: x.permute(2, 0, 1)),
                 transforms.Lambda(lambda x: x/10_000),
                 transforms.Normalize((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
                                      (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)),
@@ -313,8 +315,8 @@ def prepare_datasets(
             val_dataset = load_dataset("blanchon/EuroSAT_MSI", split="validation")
         else:
             pass
-        #train_dataset.set_format("torch", columns=["image", "label"])
-        #val_dataset.set_format("torch", columns=["image", "label"])
+        train_dataset.set_format("torch", columns=["image", "label"])
+        val_dataset.set_format("torch", columns=["image", "label"])
 
         # train_dataset = train_dataset.map(lambda x: apply_transformation(x, T_train), batched=False)
         # val_dataset = val_dataset.map(lambda x: apply_transformation(x, T_val), batched=False)

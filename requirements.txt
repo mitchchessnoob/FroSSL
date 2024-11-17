@@ -10,4 +10,5 @@ scipy
 timm
 scikit-learn
 hydra-core
+datasets
 -e git+https://github.com/uk-cliplab/representation-itl.git#egg=representation-itl
