@@ -383,7 +383,7 @@ def prepare_datasets(
             train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
         else:
             pass
-
+        train_dataset.set_format("torch", columns=["image", "label"])
         train_dataset = eurosatdataset_with_index()(train_dataset, transform)
 
     elif dataset == "eurosat":
@@ -410,7 +410,6 @@ def prepare_datasets(
             dataset_class = CustomDatasetWithoutLabels
         else:
             dataset_class = ImageFolder
-
         train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
 
     if data_fraction > 0: #TODO adapt for eurosat
@@ -447,7 +446,6 @@ def prepare_dataloader(
     Returns:
         DataLoader: the training dataloader with the desired dataset.
     """
-    print(type(train_dataset))
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
