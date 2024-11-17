@@ -50,6 +50,14 @@ Once you have the ImageNet dataset downloaded, you can create the ImageNet-100 d
 python make_imagenet100.py full/imagenet/path desired/imagenet100/path
 ```
 
+
+#### EuroSAT
+@article{helber2017eurosat,
+   title={EuroSAT: A Novel Dataset and Deep Learning Benchmark for Land Use and Land Cover Classification},
+   author={Helber, et al.},
+   journal={ArXiv preprint arXiv:1709.00029},
+   year={2017}
+}
 ## Training and Evaluating a Model
 1. Make sure you have a wandb account and are logged in via the CLI. All hyperparameters, losses, system details, etc. will get logged to wandb.
 
