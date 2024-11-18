@@ -250,8 +250,7 @@ def prepare_datasets(
     assert dataset in ["office31", "cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "EuroSAT"]
 
     if dataset in ["office31"]:
-        train_dataset = ImageFolder(train_data_path, transform=T_train)
-        val_dataset = ImageFolder(val_data_path, transform=T_val)
+        train_dataset = dataset_with_index(ImageFolder)(train_data_path, transform)
         
     elif dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
