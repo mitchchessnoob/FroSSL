@@ -282,7 +282,7 @@ def build_transform_pipeline(dataset, cfg):
             ),
         )
 
-    if cfg.grayscale.prob:
+    if cfg.grayscale.prob & (dataset[-3:] !="msi"):
         augmentations.append(transforms.RandomGrayscale(p=cfg.grayscale.prob))
 
     if cfg.gaussian_blur.prob:
