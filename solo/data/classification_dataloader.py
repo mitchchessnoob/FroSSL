@@ -98,7 +98,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     office31_pipeline = {
         "T_train": transforms.Compose(
             [
-                    transforms.Lambda(lambda x: x.convert("RGB")),
+                    # transforms.Lambda(lambda x: x.convert("RGB")),
                     transforms.Resize([256, 256]),
                     transforms.RandomCrop(224),
                     transforms.RandomHorizontalFlip(),
@@ -108,7 +108,7 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         ),
         "T_val": transforms.Compose(
            [
-                    transforms.Lambda(lambda x: x.convert("RGB")),
+                    # transforms.Lambda(lambda x: x.convert("RGB")),
                     transforms.Resize([224, 224]),
                     transforms.ToTensor(),
                     transforms.Normalize(0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)
