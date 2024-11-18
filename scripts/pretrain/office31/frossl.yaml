@@ -16,8 +16,8 @@ method: "frossl"
 backbone:
   name: "resnet18"
 method_kwargs:
-  proj_hidden_dim: 2048
-  proj_output_dim: 1024
+  proj_hidden_dim: 512
+  proj_output_dim: 256
   alpha: 2
   kernel_type: "linear"
   invariance_weight: 1.0
@@ -30,8 +30,8 @@ data:
   num_workers: 2 #original was 8
 optimizer:
   name: "lars"
-  batch_size: 256
-  lr: 0.3
+  batch_size: 64
+  lr: 0.05
   classifier_lr: 0.1
   weight_decay: 1e-4
   kwargs:
