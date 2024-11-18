@@ -204,6 +204,7 @@ def build_transform_pipeline(dataset, cfg):
     """
 
     MEANS_N_STD = {
+        "office31" : ((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
         "cifar10": ((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
         "cifar100": ((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
         "stl10": ((0.4914, 0.4823, 0.4466), (0.247, 0.243, 0.261)),
@@ -321,7 +322,10 @@ def prepare_datasets(
     if train_data_path is None:
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         train_data_path = sandbox_folder / "datasets"
-
+    if dataset in ["office31"]:
+        train_dataset = ImageFolder(train_data_path, transform=T_train)
+        val_dataset = ImageFolder(val_data_path, transform=T_val)
+        
     if dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
         train_dataset = dataset_with_index(DatasetClass)(
