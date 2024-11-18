@@ -248,23 +248,12 @@ def prepare_datasets(
         val_data_path = sandbox_folder / "datasets"
 
     assert dataset in ["office31", "cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "EuroSAT"]
-    
-    if dataset in ["EuroSAT"]: #modify!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        DatasetClass = vars(torchvision.datasets)[dataset.upper()]
-        train_dataset = DatasetClass(
-            train_data_path,
-            train=True,
-            download=download,
-            transform=T_train,
-        )
 
-        val_dataset = DatasetClass(
-            val_data_path,
-            train=False,
-            download=download,
-            transform=T_val,
-        )
-    if dataset in ["cifar10", "cifar100"]:
+    if dataset in ["office31"]:
+        train_dataset = ImageFolder(train_data_path, transform=T_train)
+        val_dataset = ImageFolder(val_data_path, transform=T_val)
+        
+    elif dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
         train_dataset = DatasetClass(
             train_data_path,
