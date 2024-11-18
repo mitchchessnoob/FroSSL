@@ -67,6 +67,8 @@ def main(cfg: DictConfig):
     else:
         if cfg.data.format == "dali":
             val_data_format = "image_folder"
+        elif cfg.data.dataset == "office31": #mm
+            val_data_format = "image_folder"
         else:
             val_data_format = cfg.data.format
 
