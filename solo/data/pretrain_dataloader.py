@@ -323,7 +323,7 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         train_data_path = sandbox_folder / "datasets"
     if dataset in ["office31"]:
-        train_dataset = ImageFolder(train_data_path, transform=transform)
+        train_dataset = dataset_with_index(ImageFolder)(train_data_path, transform)
         # val_dataset = ImageFolder(val_data_path, transform=tansform)
         
     if dataset in ["cifar10", "cifar100"]:
