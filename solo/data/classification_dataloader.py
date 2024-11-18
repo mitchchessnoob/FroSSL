@@ -313,10 +313,10 @@ def prepare_datasets(
         elif dataset[7:] == "_msi":
             train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
             val_dataset = load_dataset("blanchon/EuroSAT_MSI", split="validation")
+            train_dataset.set_format("torch", columns=["image", "label"])
+            val_dataset.set_format("torch", columns=["image", "label"])
         else:
             pass
-        train_dataset.set_format("torch", columns=["image", "label"])
-        val_dataset.set_format("torch", columns=["image", "label"])
 
         # train_dataset = train_dataset.map(lambda x: apply_transformation(x, T_train), batched=False)
         # val_dataset = val_dataset.map(lambda x: apply_transformation(x, T_val), batched=False)

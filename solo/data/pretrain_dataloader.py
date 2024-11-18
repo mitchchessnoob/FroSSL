@@ -381,9 +381,9 @@ def prepare_datasets(
             train_dataset = load_dataset("blanchon/EuroSAT_RGB", split="train")
         elif dataset[7:] == "_msi":
             train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
+            train_dataset.set_format("torch", columns=["image", "label"])
         else:
             pass
-        train_dataset.set_format("torch", columns=["image", "label"])
         train_dataset = eurosatdataset_with_index()(train_dataset, transform)
 
     elif dataset == "eurosat":
