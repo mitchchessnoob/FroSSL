@@ -206,6 +206,14 @@ class FullTransformPipeline:
         return "\n".join(str(transform) for transform in self.transforms)
 
 
+def apply_rgb_transform(transform, x): # specific for msi, unbatched!
+    rgb = [2, 1, 0]
+    x[rgb, :, :] =  transform(x[rgb, :, :])
+    return x
+
+def get_rgb_transfrom(transform):
+    return transforms.Lambda(lambda x: apply_rgb_transform(transform, x))
+
 def build_transform_pipeline(dataset, cfg):
     """Creates a pipeline of transformations given a dataset and an augmentation Cfg node.
     The node needs to be in the following format:
@@ -251,6 +259,10 @@ def build_transform_pipeline(dataset, cfg):
     )
 
     augmentations = []
+    if dataset[-3:] =="msi": # not an image! 
+        augmentations.append(transforms.Lambda(lambda x: x.permute(2, 0, 1)))
+        augmentations.append(transforms.Lambda(lambda x: x/10_000))
+    
     if cfg.rrc.enabled:
         augmentations.append(
             transforms.RandomResizedCrop(
@@ -266,43 +278,85 @@ def build_transform_pipeline(dataset, cfg):
                 interpolation=transforms.InterpolationMode.BICUBIC,
             ),
         )
+    
+    if dataset[-3:] !="msi": # image data
+        if cfg.color_jitter.prob:
+            augmentations.append(
+                transforms.RandomApply(
+                    [
+                        transforms.ColorJitter(
+                            cfg.color_jitter.brightness,
+                            cfg.color_jitter.contrast,
+                            cfg.color_jitter.saturation,
+                            cfg.color_jitter.hue,
+                        )
+                    ],
+                    p=cfg.color_jitter.prob,
+                ),
+            )
 
-    if cfg.color_jitter.prob:
-        augmentations.append(
-            transforms.RandomApply(
-                [
-                    transforms.ColorJitter(
-                        cfg.color_jitter.brightness,
-                        cfg.color_jitter.contrast,
-                        cfg.color_jitter.saturation,
-                        cfg.color_jitter.hue,
-                    )
-                ],
-                p=cfg.color_jitter.prob,
-            ),
-        )
+        if cfg.grayscale.prob:
+            augmentations.append(transforms.RandomGrayscale(p=cfg.grayscale.prob))
 
-    if cfg.grayscale.prob & (dataset[-3:] !="msi"):
-        augmentations.append(transforms.RandomGrayscale(p=cfg.grayscale.prob))
+        if cfg.gaussian_blur.prob:
+            augmentations.append(transforms.RandomApply([GaussianBlur()], p=cfg.gaussian_blur.prob))
 
-    if cfg.gaussian_blur.prob:
-        augmentations.append(transforms.RandomApply([GaussianBlur()], p=cfg.gaussian_blur.prob))
+        if cfg.solarization.prob:
+            augmentations.append(transforms.RandomApply([Solarization()], p=cfg.solarization.prob))
 
-    if cfg.solarization.prob:
-        augmentations.append(transforms.RandomApply([Solarization()], p=cfg.solarization.prob))
+        if cfg.equalization.prob:
+            augmentations.append(transforms.RandomApply([Equalization()], p=cfg.equalization.prob))
 
-    if cfg.equalization.prob:
-        augmentations.append(transforms.RandomApply([Equalization()], p=cfg.equalization.prob))
+        if cfg.horizontal_flip.prob:
+            augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
 
-    if cfg.horizontal_flip.prob:
-        augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
-
-    if dataset[-3:] =="msi": # not an image!
-        augmentations.append(transforms.Lambda(lambda x: x.tensor(x, dtype=torch.float32).permute(2, 0, 1)))
-        augmentations.append(transforms.Lambda(lambda x: x/10_000))
-    else:
         augmentations.append(transforms.ToTensor())
+    else: # msi # not yet tested!!
+        if cfg.color_jitter.prob:
+            augmentations.append(
+                transforms.RandomApply(
+                    [   
+                        get_rgb_transfrom(
+                        transforms.ColorJitter(
+                            cfg.color_jitter.brightness,
+                            cfg.color_jitter.contrast,
+                            cfg.color_jitter.saturation,
+                            cfg.color_jitter.hue,
+                        )
+                        )
+                    ],
+                    p=cfg.color_jitter.prob,
+                ),
+            )
+            
+        if cfg.grayscale.prob:
+            augmentations.append(get_rgb_transfrom(transforms.RandomGrayscale(p=cfg.grayscale.prob)))
 
+        if cfg.gaussian_blur.prob:
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(GaussianBlur())], p=cfg.gaussian_blur.prob))
+
+        if cfg.solarization.prob:
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Solarization())], p=cfg.solarization.prob))
+
+        if cfg.equalization.prob:
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Equalization())], p=cfg.equalization.prob))
+
+        # not rgb
+        if cfg.noise.sigma:
+            augmentations.append(transforms.Lambda(lambda x: x + torch.rand(x.shape)*cfg.noise.sigma))
+
+        if cfg.rotation.max:
+            augmentations.append(transforms.RandomRotation(degrees=cfg.rotation.max))
+
+        if cfg.perspective.prob:
+            augmentations.append(transforms.RandomPerspective(distortion_scale=cfg.perspective.distortion, p=cfg.perspective.prob))
+        
+        if cfg.horizontal_flip.prob:
+            augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
+        
+        if cfg.vertical_flip.prob:
+            augmentations.append(transforms.RandomVerticalFlip(p=cfg.vertical_flip.prob))
+        
     augmentations.append(transforms.Normalize(mean=mean, std=std))
 
     augmentations = transforms.Compose(augmentations)
@@ -386,17 +440,17 @@ def prepare_datasets(
             pass
         train_dataset = eurosatdataset_with_index()(train_dataset, transform)
 
-    elif dataset == "eurosat":
-        dataset_size = 27_000
-        train_size = int(0.7 * dataset_size) 
+    # elif dataset == "eurosat":
+    #     dataset_size = 27_000
+    #     train_size = int(0.7 * dataset_size) 
 
-        indices = list(range(dataset_size))
-        np.random.seed(72)
-        np.random.shuffle(indices)
-        train_indices = indices[:train_size]
+    #     indices = list(range(dataset_size))
+    #     np.random.seed(72)
+    #     np.random.shuffle(indices)
+    #     train_indices = indices[:train_size]
     	
-        #train_dataset = Subset(EuroSAT(root="datasets", transform=transform, download=True), train_indices)
-        train_dataset = Subset(dataset_with_index(EuroSAT)(root="datasets", transform=transform, download=True), train_indices)
+    #     #train_dataset = Subset(EuroSAT(root="datasets", transform=transform, download=True), train_indices)
+    #     train_dataset = Subset(dataset_with_index(EuroSAT)(root="datasets", transform=transform, download=True), train_indices)
 
     elif dataset in ["imagenet", "imagenet100", "tiny-imagenet"]:
         if data_format == "h5":

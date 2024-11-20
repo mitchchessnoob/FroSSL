@@ -202,7 +202,9 @@ class BaseMethod(pl.LightningModule):
                 )
                 self.backbone.maxpool = nn.Identity()
             elif cfg.data.dataset[-3:] == "msi": #TODO adapt kernel size, ..
-                self.backbone.conv1.in_channels = 13
+                self.backbone.conv1 = nn.Conv2d(
+                    13, 64, kernel_size=7, stride=2, padding=3, bias=False
+                )
         else:
             self.features_dim: int = self.backbone.num_features
         ##############################
