@@ -50,6 +50,10 @@ def main(cfg: DictConfig):
         if cifar:
             backbone.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
             backbone.maxpool = nn.Identity()
+        elif cfg.data.dataset[-3:] == "msi": #TODO adapt kernel size, ..
+            backbone.conv1 = nn.Conv2d(
+                13, 64, kernel_size=7, stride=2, padding=3, bias=False
+            )
 
     ckpt_path = cfg.get("pretrained_feature_extractor", None)
     # if no path, read a path from the last_ckpt file
