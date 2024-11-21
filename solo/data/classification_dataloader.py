@@ -318,28 +318,9 @@ def prepare_datasets(
         else:
             pass
 
-        # train_dataset = train_dataset.map(lambda x: apply_transformation(x, T_train), batched=False)
-        # val_dataset = val_dataset.map(lambda x: apply_transformation(x, T_val), batched=False)
-
         # transform into a torch Dataset
         train_dataset = EuroSATDataset(train_dataset, transform=T_train)
         val_dataset = EuroSATDataset(val_dataset, transform=T_val)
-
-
-
-
-    elif dataset == "eurosat": # old pipeline for torch dataset!!
-        dataset_size = 27_000
-        train_size = int(0.7 * dataset_size) 
-
-        indices = list(range(dataset_size))
-        np.random.seed(72)
-        np.random.shuffle(indices)
-        train_indices = indices[:train_size]
-        val_indices = indices[train_size:]
-        # different transformations!
-        train_dataset = Subset(EuroSAT(root="datasets", transform=T_train, download=True), train_indices)
-        val_dataset = Subset(EuroSAT(root="datasets", transform=T_val), val_indices)
 
     elif dataset in ["imagenet", "imagenet100", "custom", "tiny-imagenet"]:
         if data_format == "h5":

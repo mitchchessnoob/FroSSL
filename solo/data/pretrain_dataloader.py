@@ -26,6 +26,7 @@ from typing import Callable, List, Optional, Sequence, Type, Union
 import torch
 import torchvision
 from PIL import Image, ImageFilter, ImageOps
+from torchvision.transforms import ToPILImage
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Dataset, Subset
@@ -206,13 +207,17 @@ class FullTransformPipeline:
         return "\n".join(str(transform) for transform in self.transforms)
 
 
-def apply_rgb_transform(transform, x): # specific for msi, unbatched!
+def apply_rgb_transform(transform, x, pil=False): # specific for msi, unbatched!
+    to_pil = ToPILImage()
     rgb = [2, 1, 0]
-    x[rgb, :, :] =  transform(x[rgb, :, :])
+    if pil:
+        x[rgb, :, :] =  transforms.ToTensor()(transform(to_pil(x[rgb, :, :])))
+    else:
+        x[rgb, :, :] =  transform(x[rgb, :, :])
     return x
 
-def get_rgb_transfrom(transform):
-    return transforms.Lambda(lambda x: apply_rgb_transform(transform, x))
+def get_rgb_transfrom(transform, pil=False):
+    return transforms.Lambda(lambda x: apply_rgb_transform(transform, x, pil))
 
 def build_transform_pipeline(dataset, cfg):
     """Creates a pipeline of transformations given a dataset and an augmentation Cfg node.
@@ -333,13 +338,13 @@ def build_transform_pipeline(dataset, cfg):
             augmentations.append(get_rgb_transfrom(transforms.RandomGrayscale(p=cfg.grayscale.prob)))
 
         if cfg.gaussian_blur.prob:
-            augmentations.append(transforms.RandomApply([get_rgb_transfrom(GaussianBlur())], p=cfg.gaussian_blur.prob))
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(GaussianBlur(), pil=True)], p=cfg.gaussian_blur.prob))
 
         if cfg.solarization.prob:
-            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Solarization())], p=cfg.solarization.prob))
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Solarization(), pil=True)], p=cfg.solarization.prob))
 
         if cfg.equalization.prob:
-            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Equalization())], p=cfg.equalization.prob))
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Equalization(), pil=True)], p=cfg.equalization.prob))
 
         # not rgb
         if cfg.noise.sigma:
@@ -439,18 +444,6 @@ def prepare_datasets(
         else:
             pass
         train_dataset = eurosatdataset_with_index()(train_dataset, transform)
-
-    # elif dataset == "eurosat":
-    #     dataset_size = 27_000
-    #     train_size = int(0.7 * dataset_size) 
-
-    #     indices = list(range(dataset_size))
-    #     np.random.seed(72)
-    #     np.random.shuffle(indices)
-    #     train_indices = indices[:train_size]
-    	
-    #     #train_dataset = Subset(EuroSAT(root="datasets", transform=transform, download=True), train_indices)
-    #     train_dataset = Subset(dataset_with_index(EuroSAT)(root="datasets", transform=transform, download=True), train_indices)
 
     elif dataset in ["imagenet", "imagenet100", "tiny-imagenet"]:
         if data_format == "h5":
