@@ -18,6 +18,9 @@
     prob: 0.0
   noise:
     sigma: 0
+  gaussian_filter: 
+    prob: 0
+    sigma: 0
   rotation:
     max: 90
   perspective:
@@ -49,6 +52,9 @@
   equalization:
     prob: 0.0
   noise:
+    sigma: 0
+  gaussian_filter: 
+    prob: 0
     sigma: 0
   rotation:
     max: 90

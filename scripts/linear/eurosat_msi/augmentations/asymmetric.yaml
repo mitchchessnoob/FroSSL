@@ -18,6 +18,9 @@
     prob: 0.0
   noise:
     sigma: 0.01
+  gaussian_filter: 
+    prob: 0
+    sigma: 0
   rotation:
     max: 90
   perspective:
@@ -50,6 +53,9 @@
     prob: 0.0
   noise:
     sigma: 0.01
+  gaussian_filter: 
+    prob: 0
+    sigma: 0
   rotation:
     max: 90
   perspective:

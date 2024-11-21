@@ -33,6 +33,7 @@ from torch.utils.data.dataset import Dataset, Subset
 from torchvision import transforms
 from torchvision.datasets import STL10, ImageFolder, EuroSAT
 from datasets import load_dataset
+from scipy.ndimage import gaussian_filter
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -209,7 +210,7 @@ class FullTransformPipeline:
 
 def apply_rgb_transform(transform, x, pil=False): # specific for msi, unbatched!
     to_pil = ToPILImage()
-    rgb = [2, 1, 0]
+    rgb = [3, 2, 1]
     if pil:
         x[rgb, :, :] =  transforms.ToTensor()(transform(to_pil(x[rgb, :, :])))
     else:
@@ -347,6 +348,9 @@ def build_transform_pipeline(dataset, cfg):
             augmentations.append(transforms.RandomApply([get_rgb_transfrom(Equalization(), pil=True)], p=cfg.equalization.prob))
 
         # not rgb
+        if cfg.gaussian_filter.prob:
+            augmentations.append(transforms.RandomApply([transforms.Lambda(lambda x: gaussian_filter(x, cfg.gaussian_filter.sigma))], p=cfg.gaussian_filter.prob))
+
         if cfg.noise.sigma:
             augmentations.append(transforms.Lambda(lambda x: x + torch.rand(x.shape)*cfg.noise.sigma))
 
