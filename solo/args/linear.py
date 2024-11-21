@@ -22,6 +22,7 @@ _N_CLASSES_PER_DATASET = {
     "imagenet": 1000,
     "imagenet100": 100,
     "tiny-imagenet": 200,
+    "office31":31,
 }
 
 
@@ -33,6 +34,7 @@ _SUPPORTED_DATASETS = [
     "imagenet100",
     "tiny-imagenet",
     "custom",
+    "office31",
 ]
 
 
