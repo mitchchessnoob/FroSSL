@@ -27,9 +27,10 @@ _N_CLASSES_PER_DATASET = {
     "imagenet": 1000,
     "imagenet100": 100,
     "tiny-imagenet": 200,
-    "EuroSAT": 10,
-    "office31":31
+    "office31":31,
+    "office_home":65,
 }
+
 
 _SUPPORTED_DATASETS = [
     "cifar10",
@@ -39,8 +40,8 @@ _SUPPORTED_DATASETS = [
     "imagenet100",
     "tiny-imagenet",
     "custom",
-    "EuroSAT",
-    "office31"
+    "office31",
+    "office_home",
 ]
 
 
