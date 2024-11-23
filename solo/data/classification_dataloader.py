@@ -77,21 +77,27 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     Returns:
         Tuple[nn.Module, nn.Module]: training and validation transformation pipelines.
     """
-    EuroSAT_pipeline = {        #modify!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    office_home_pipeline = {
         "T_train": transforms.Compose(
             [
-                transforms.RandomResizedCrop(size=64, scale=(0.08, 1.0)),
+                transforms.Resize([256, 256]),
+                transforms.RandomCrop(224),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
-                transforms.Normalize((0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465,0.4914),
-                                     (0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247)),
+                transforms.Normalize(
+                    mean=(0.485, 0.456, 0.406),
+                    std=(0.229, 0.224, 0.225),
+                    ),
             ]
         ),
         "T_val": transforms.Compose(
             [
+                transforms.Resize([224, 224]),
                 transforms.ToTensor(),
-                transforms.Normalize((0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465, 0.4914, 0.4822, 0.4465,0.4914),
-                                     (0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247, 0.243, 0.261, 0.247)),
+                transforms.Normalize(
+                    mean=(0.485, 0.456, 0.406),
+                    std=(0.229, 0.224, 0.225),
+                    ),
             ]
         ),
     }
@@ -202,7 +208,8 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         "imagenet": imagenet_pipeline,
         "tiny-imagenet": tiny_imagenet_pipeline,
         "custom": custom_pipeline,
-        "office31": office31_pipeline
+        "office31": office31_pipeline,
+        "office_home":office_home_pipeline,
     }
 
     assert dataset in pipelines
@@ -251,9 +258,9 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         val_data_path = sandbox_folder / "datasets"
 
-    assert dataset in ["office31", "cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "EuroSAT"]
+    assert dataset in ["office_home", "office31", "cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "EuroSAT"]
 
-    if dataset in ["office31"]:
+    if dataset in ["office31", "office_home"]:
         train_dataset = ImageFolder(train_data_path, transform=T_train)
         val_dataset = ImageFolder(val_data_path, transform=T_val)
         
