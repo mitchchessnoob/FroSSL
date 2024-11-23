@@ -200,7 +200,6 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     custom_pipeline = build_custom_pipeline()
 
     pipelines = {
-        "EuroSAT" : EuroSAT_pipeline,
         "cifar10": cifar_pipeline,
         "cifar100": cifar_pipeline,
         "stl10": stl_pipeline,
