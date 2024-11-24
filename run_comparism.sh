@@ -1,6 +1,6 @@
 echo "experiment to compare multicrop with no multicrop for eurosat msi."
 
-EXPERIMENT_NAME="eurosat_cropsize"
+EXPERIMENT_NAME="eurosat_cropsize64"
 DATASET="eurosat_msi"
 BACKBONE="resnet18" 
 CONFIG_NAME="frossl_hat"
@@ -27,7 +27,7 @@ python3 -u main_linear.py \
 
 
 
-EXPERIMENT_NAME="eurosat_filter"
+EXPERIMENT_NAME="eurosat_cropsize64_filter"
 CONFIG_NAME="frossl"
 
 python3 -u main_pretrain.py \

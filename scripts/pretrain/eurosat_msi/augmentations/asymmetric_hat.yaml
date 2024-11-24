@@ -32,7 +32,7 @@
     prob: 0.5
   horizontal_flip:
     prob: 0.5
-  crop_size: 48
+  crop_size: 64
   num_crops: 1
 
 - rrc:
@@ -69,5 +69,5 @@
     prob: 0.5
   horizontal_flip:
     prob: 0.5
-  crop_size: 48
+  crop_size: 64
   num_crops: 1
