@@ -41,11 +41,11 @@
     crop_max_scale: 1.0
   # rgb transfromations
   color_jitter:
-    prob: 0
-    brightness: 0
-    contrast: 0
-    saturation: 0
-    hue: 0
+    prob: 0.8
+    brightness: 0.4
+    contrast: 0.4
+    saturation: 0.2
+    hue: 0.1
   grayscale:
     prob: 0
   gaussian_blur:

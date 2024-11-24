@@ -1,4 +1,4 @@
-echo "experiment to compare multicrop with no multicrop for eurosat msi."
+echo "run comparism."
 
 EXPERIMENT_NAME="eurosat_cropsize64"
 DATASET="eurosat_msi"
