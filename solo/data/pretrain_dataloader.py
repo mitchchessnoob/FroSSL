@@ -349,7 +349,7 @@ def build_transform_pipeline(dataset, cfg):
 
         # not rgb
         if cfg.gaussian_filter.prob:
-            augmentations.append(transforms.RandomApply([transforms.Lambda(lambda x: gaussian_filter(x, cfg.gaussian_filter.sigma))], p=cfg.gaussian_filter.prob))
+            augmentations.append(transforms.RandomApply([transforms.Lambda(lambda x: torch.tensor(gaussian_filter(x, cfg.gaussian_filter.sigma)))], p=cfg.gaussian_filter.prob))
 
         if cfg.noise.sigma:
             augmentations.append(transforms.Lambda(lambda x: x + torch.rand(x.shape)*cfg.noise.sigma))
