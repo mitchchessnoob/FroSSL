@@ -1,5 +1,5 @@
 import torch.nn as nn
-import torchvision.models import models
+import torchvision.models as models
 class SSLModel(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
