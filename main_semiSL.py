@@ -1,4 +1,5 @@
 import sys
+import argparse
 import torch.nn as nn
 import sys
 from torchvision import models
@@ -123,4 +124,10 @@ def main(configs_path, augments_path, key):
         wandb.finish()
         raise e
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description="Run semi-supervised training.")
+    parser.add_argument("--config_path", type=str, required=True, help="Path to the configuration file.")
+    parser.add_argument("--augments_path", type=str, required=True, help="Path to the augmentations file.")
+    parser.add_argument("--key", type=str, required=True, help="WandB API key.")
+    
+    args = parser.parse_args()
+    main(args.config_path, args.augments_path, args.key)
