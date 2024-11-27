@@ -3,7 +3,6 @@ import torch.nn as nn
 import sys
 from torchvision import models
 import torch
-sys.path.append('/content/FroSSL')  # Add the parent directory of "solo"
 from solo.args.linear import parse_cfg
 from solo.data.pretrain_dataloader import (
     NCropAugmentation,
