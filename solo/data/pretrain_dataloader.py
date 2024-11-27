@@ -330,7 +330,7 @@ def prepare_datasets(
          else:
             dataset_class = ImageFolder
 
-        train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
+         train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
         
         
     if dataset in ["cifar10", "cifar100"]:
