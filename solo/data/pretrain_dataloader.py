@@ -323,9 +323,15 @@ def prepare_datasets(
     if train_data_path is None:
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         train_data_path = sandbox_folder / "datasets"
+        
     if dataset in ["office31", "office_home"]:
-        train_dataset = dataset_with_index(ImageFolder)(train_data_path, transform)
-        # val_dataset = ImageFolder(val_data_path, transform=tansform)
+         if no_labels:
+            dataset_class = CustomDatasetWithoutLabels
+        else:
+            dataset_class = ImageFolder
+
+        train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
+        
         
     if dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
