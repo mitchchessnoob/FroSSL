@@ -11,6 +11,10 @@ from solo.data.pretrain_dataloader import (
     prepare_dataloader,
     prepare_n_crop_transform
 )
+from semi_supervised.utils.evaluate import evaluate
+from semi_supervised.utils.train_step import train_step
+from semi_supervised.utils.optim_sch import create_optimizer_and_scheduler
+from semi_supervised.utils.unalbeled_dataset import flatten_image_directory
 from solo.data.classification_dataloader import prepare_transforms
 from solo.utils.lars import LARS
 from solo.utils.lr_scheduler import LinearWarmupCosineAnnealingLR
@@ -119,5 +123,4 @@ def main(configs_path, augments_path, key):
         wandb.finish()
         raise e
 if __name__ == '__main__':
-    main("/content/FroSSL/semi_supervised/configs.yaml", "/content/FroSSL/scripts/pretrain/office31/augmentations/asymmetric.yaml",\
-         "57e49312fc462a736d24abd32cc7891d91258b76")
+    main()
