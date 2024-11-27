@@ -62,7 +62,7 @@ def main(configs_path, augments_path, key):
         )
 
         unlabeled_dataset = prepare_datasets(
-            dataset="custom", #configs.data.dataset
+            dataset=configs.data.dataset,
             transform=transform,
             train_data_path=configs.data.unlabeled_path,
             data_format='image_folder',
