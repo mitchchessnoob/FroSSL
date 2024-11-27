@@ -66,11 +66,21 @@ def main(configs_path, augments_path, key):
             train_data_path=configs.data.labeled_path,
             data_format='image_folder'
         )
-
+        
+        proper_format_unlabeled = True
+        for item in os.listdir(configs.data.unlabeled_path):
+            if os.path.isdir(os.path.join(configs.data.unlabeled_path, item)):
+                proper_format_unlabeled = False
+        if proper_format_unlabeled:
+            unlabeled_path = configs.data.unlabeled_path
+        else:
+            unlabeled_path = "/temporary_dir"
+            flatten_image_directory(configs.data.unlabeled_path, unlabeled_path)
+            
         unlabeled_dataset = prepare_datasets(
             dataset=configs.data.dataset,
             transform=transform,
-            train_data_path=configs.data.unlabeled_path,
+            train_data_path=unlabeled_path,
             data_format='image_folder',
             no_labels=True
         )
