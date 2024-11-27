@@ -1,3 +1,5 @@
+from solo.utils.lars import LARS
+from solo.utils.lr_scheduler import LinearWarmupCosineAnnealingLR
 def create_optimizer_and_scheduler(model, configs):
     classifier_params = []
     other_params = []
