@@ -327,7 +327,7 @@ def prepare_datasets(
     if dataset in ["office31", "office_home"]:
          if no_labels:
             dataset_class = CustomDatasetWithoutLabels
-        else:
+         else:
             dataset_class = ImageFolder
 
         train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
