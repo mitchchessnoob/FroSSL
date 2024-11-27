@@ -14,7 +14,7 @@ from solo.data.pretrain_dataloader import (
 from semi_supervised.utils.evaluate import evaluate
 from semi_supervised.utils.train_step import train_step
 from semi_supervised.utils.optim_sch import create_optimizer_and_scheduler
-from semi_supervised.utils.unalbeled_dataset import flatten_image_directory
+from semi_supervised.utils.unlabeled_dataset import flatten_image_directory
 from solo.data.classification_dataloader import prepare_transforms
 from solo.utils.lars import LARS
 from solo.utils.lr_scheduler import LinearWarmupCosineAnnealingLR
