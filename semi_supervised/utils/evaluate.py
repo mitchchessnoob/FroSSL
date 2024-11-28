@@ -1,5 +1,5 @@
 import wandb
-
+import torch
 def evaluate(model, test_loader, criterion, device, epoch):
     model.eval()
     total_loss = 0
