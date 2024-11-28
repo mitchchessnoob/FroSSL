@@ -14,7 +14,7 @@ name: "frossl-eurosat" # change here for cifar100
 pretrain_method: "frossl"
 
 backbone:
-  name: "resnet18"
+  name: "resnet50"
 method_kwargs:
   proj_hidden_dim: 2048
   proj_output_dim: 1024
