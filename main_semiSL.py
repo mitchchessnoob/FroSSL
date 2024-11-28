@@ -118,7 +118,7 @@ def main(configs_path, augments_path, key):
             train_loss, train_acc = train_step(model, labeled_loader, unlabeled_loader,
                                   optimizer, scheduler, criterion, device, epoch, configs)
 
-            test_loss, test_acc = evaluate(model, test_loader, criterion, device)
+            test_loss, test_acc = evaluate(model, test_loader, criterion, device, epoch)
 
             print(f'Epoch: {epoch+1}/{num_epochs}')
             print(f'Train Loss: {train_loss:.4f}')
