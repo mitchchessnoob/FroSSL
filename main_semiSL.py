@@ -123,7 +123,7 @@ def main(configs_path, augments_path, key):
             print(f'Epoch: {epoch+1}/{num_epochs}')
             print(f'Train Loss: {train_loss:.4f}')
             print(f'Test Loss: {test_loss:.4f}, Test Acc: {test_acc:.2f}%')
-
+            os.makedirs(configs.checkpoint.dir, exist_ok=True)
             if test_acc > best_acc and configs.checkpoint.enabled:
                 best_acc = test_acc
                 torch.save(model.state_dict(), f"{configs.checkpoint.dir}/best_model.pth")
