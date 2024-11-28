@@ -11,7 +11,9 @@ def flatten_image_directory(source_dir, target_dir):
     """
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)  # Create target directory if it doesn't exist
-
+    if len(os.listdir(target_dir)) > 0:
+        print(f"Target directory {target_dir} is not empty, assuming it's already full of images")
+        return
     # Traverse the source directory
     for root, _, files in os.walk(source_dir):
         for file in files:
