@@ -75,7 +75,7 @@ def main(configs_path, augments_path, key):
         if proper_format_unlabeled:
             unlabeled_path = configs.data.unlabeled_path
         else:
-            unlabeled_path = "/temporary_dir"
+            unlabeled_path = "./temporary_dir"
             flatten_image_directory(configs.data.unlabeled_path, unlabeled_path)
             
         unlabeled_dataset = prepare_datasets(
