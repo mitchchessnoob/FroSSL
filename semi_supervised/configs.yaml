@@ -20,7 +20,7 @@ method_kwargs:
   proj_output_dim: 256
   alpha: 2
   kernel_type: "linear"
-  invariance_weight: 1.0
+  invariance_weight: 1.4
 
 data:
   dataset: office31 # change here for cifar100
@@ -33,7 +33,7 @@ data:
   num_workers: 2 #original was 8
 optimizer:
   name: "lars"
-  batch_size: 32
+  batch_size: 64
   lr: 0.003
   classifier_lr: 0.1
   weight_decay: 1e-4
