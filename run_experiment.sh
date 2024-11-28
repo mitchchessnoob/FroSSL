@@ -1,6 +1,6 @@
 echo "run experiments."
 
-EXPERIMENT_NAME="eurosat_cropsize64_rgb-augm"
+EXPERIMENT_NAME="eurosat_cs64_mv"
 DATASET="eurosat_msi"
 BACKBONE="resnet18" 
 CONFIG_NAME="frossl_hat"
