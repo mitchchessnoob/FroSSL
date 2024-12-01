@@ -1,5 +1,33 @@
-def main():
-  model = segmentation_model.cuda()
+from torchvision.datasets import ImageFolder, CIFAR10, STL10
+import torch
+from torch import nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from torchvision.models import resnet18
+from torchvision.datasets import CIFAR10
+from tqdm import tqdm_notebook as tqdm
+from torchvision.utils import save_image, make_grid
+from matplotlib import pyplot as plt
+from matplotlib.colors import hsv_to_rgb
+from matplotlib.image import BboxImage
+from matplotlib.transforms import Bbox, TransformedBbox
+import numpy as np
+from IPython import display
+import requests
+from io import BytesIO
+from PIL import Image
+from PIL import Image, ImageSequence
+from IPython.display import HTML
+import warnings
+from matplotlib import rc
+import gc
+from WSOL.utils import dataloader, WSOL_model, attention, calculate_attention_metrics, safe_tensor_to_numpy
+
+def main(dataset, model, key):
+  train_iter, test_iter, classes = dataloader(dataset)
+  model = WSOL_model(model, dataset)
+  model = model.cuda()
   num_epochs = 5
   criterion = nn.BCEWithLogitsLoss()
   optimizer = torch.optim.SGD(
@@ -11,7 +39,7 @@ def main():
   lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,78,eta_min=0.001)
   best_acc = 0
   if wandb.api.api_key is None:
-    wandb.login(key="57e49312fc462a736d24abd32cc7891d91258b76")
+    wandb.login(key=key)
   try:
       wandb.init(project="Weakly-Supervised Object Localization", id="cifar10 resnet18 not pretrained",\
                  resume="auto", settings=wandb.Settings(init_timeout=300),\
@@ -147,30 +175,30 @@ def main():
             best_acc = epoch_averages['accuracy']
             torch.save(model.state_dict(), './model_not_pretrained.pth')
   
-          conf = torch.max(nn.functional.softmax(seg_out, dim=1), dim=1)[0]
-          hue = (torch.argmax(seg_out, dim=1).float() + 0.5)/10
-          x -= x.min()
-          x /= x.max()
-          gs_im = x.mean(1)
-          gs_mean = gs_im.mean()
-          gs_min = gs_im.min()
-          gs_max = torch.max((gs_im-gs_min))
-          gs_im = (gs_im - gs_min)/gs_max
-          hsv_im = torch.stack((hue.float(), attn.squeeze().float(), gs_im.float()), -1)
-          im = hsv_to_rgb(hsv_im.cpu().detach().numpy())
-          ex = make_grid(torch.tensor(im).permute(0,3,1,2), normalize=True, nrow=25)
-          attns = make_grid(attn, normalize=False, nrow=25)
-          attns = attns.cpu().detach()
-          inputs = make_grid(x, normalize=True, nrow=25).cpu().detach()
-          display.clear_output(wait=True)
-          plt.figure(figsize=(20,8))
-          plt.imshow(np.concatenate((inputs.numpy().transpose(1,2,0),ex.numpy().transpose(1,2,0), attns.numpy().transpose(1,2,0)), axis=0))
+          # conf = torch.max(nn.functional.softmax(seg_out, dim=1), dim=1)[0]
+          # hue = (torch.argmax(seg_out, dim=1).float() + 0.5)/10
+          # x -= x.min()
+          # x /= x.max()
+          # gs_im = x.mean(1)
+          # gs_mean = gs_im.mean()
+          # gs_min = gs_im.min()
+          # gs_max = torch.max((gs_im-gs_min))
+          # gs_im = (gs_im - gs_min)/gs_max
+          # hsv_im = torch.stack((hue.float(), attn.squeeze().float(), gs_im.float()), -1)
+          # im = hsv_to_rgb(hsv_im.cpu().detach().numpy())
+          # ex = make_grid(torch.tensor(im).permute(0,3,1,2), normalize=True, nrow=25)
+          # attns = make_grid(attn, normalize=False, nrow=25)
+          # attns = attns.cpu().detach()
+          # inputs = make_grid(x, normalize=True, nrow=25).cpu().detach()
+          # display.clear_output(wait=True)
+          # plt.figure(figsize=(20,8))
+          # plt.imshow(np.concatenate((inputs.numpy().transpose(1,2,0),ex.numpy().transpose(1,2,0), attns.numpy().transpose(1,2,0)), axis=0))
   
-          plt.xticks(np.linspace(18,324,10), classes)
-          plt.xticks(fontsize=20)
-          plt.yticks([])
-          plt.title('CIFAR10 Epoch:{:02d}, Train:{:.3f}, Test:{:.3f}'.format(epoch, avg_acc, epoch_averages['accuracy']), fontsize=20)
-          display.display(plt.gcf())
+          # plt.xticks(np.linspace(18,324,10), classes)
+          # plt.xticks(fontsize=20)
+          # plt.yticks([])
+          # plt.title('CIFAR10 Epoch:{:02d}, Train:{:.3f}, Test:{:.3f}'.format(epoch, avg_acc, epoch_averages['accuracy']), fontsize=20)
+          # display.display(plt.gcf())
   
           torch.cuda.empty_cache()
           gc.collect()
@@ -179,3 +207,11 @@ def main():
       wandb.finish()
       raise e
   
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Run semi-supervised training.")
+    parser.add_argument("--dataset", type=str, required=True, help="Path to the configuration file.")
+    parser.add_argument("--model", required=True, help="Base model")
+    parser.add_argument("--key", type=str, required=True, help="WandB API key.")
+    
+    args = parser.parse_args()
+    main(args.config_path, args.augments_path, args.key)
