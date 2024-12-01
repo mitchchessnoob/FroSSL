@@ -67,7 +67,7 @@ def dataloader(str: dataset):
   return train_iter, test_iter, classes
 
 
-def create_frozen_resnet(model, num_classes=10, str: dataset):
+def WSOL_model(model, dataset, num_classes=10):
     # Load pretrained model
     image_dims = {"cifar10":32, "stl10":96}
     image_dim = image_dims[dataset]
