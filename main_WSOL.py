@@ -44,12 +44,6 @@ def main(dataset, model, key):
     wandb.login(key=key)
   try:
       wandb.init(project="Weakly-Supervised Object Localization", id="cifar10 resnet18 not pretrained",\
-                 resume="auto", settings=wandb.Settings(init_timeout=300),\
-                 config= {"learning_rate": 0.01,
-                          "architecture": "resnet18 not pretrained",
-                          "dataset": "CIFAR-10",
-                          "epochs": num_epochs,
-                          },
                  mode = "online"
   
                  )
@@ -87,7 +81,7 @@ def main(dataset, model, key):
                 'train_accuracy_step': acc/(i*len(_label))
               })
               del x, _label, label, seg_out, attn, logit, loss
-              #train_pbar.set_description('Accuracy: {:.3f}%'.format(100*(logit.argmax(-1)==_label).float().mean()))
+              
   
           avg_loss = epoch_loss / (i + 1)
           losses.append(avg_loss)
@@ -122,11 +116,30 @@ def main(dataset, model, key):
               loss = criterion(logit, label)
   
   
-              test_pbar.set_description(
-                  f'Test Acc: {100*acc:.2f}% | Loss: {loss.item():.4f}'
-              )
+              loss = criterion(logit, label)
+              accuracy = (logit.argmax(-1)==_label).float().mean()
+              
+              # Calculate attention metrics
+              attention_stats = calculate_attention_metrics(attn, seg_out, _label)
+              
+              # Log step metrics to wandb
+              wandb.log({
+                  'test/step_loss': loss.item(),
+                  'test/step_accuracy': accuracy.item(),
+                  'attention/step_mean_coverage': attention_stats['mean_coverage'],
+                  'attention/step_peak_response': attention_stats['peak_response'],
+                  'attention/step_smoothness': attention_stats['smoothness'],
+                  'attention/step_peak_to_background': attention_stats['peak_to_background'],
+                  'attention/step_contiguity': attention_stats['attention_contiguity'],
+                  'attention/step_class_std': attention_stats['class_attention_std'],
+                  'attention/step_activation_consistency': attention_stats['activation_consistency']
+              })
+              for key in attention_stats:
+                  epoch_metrics[key].append(attention_stats[key])
+              epoch_metrics['loss'].append(loss.item())
+              epoch_metrics['accuracy'].append(accuracy.item())
   
-              del  _label, label, logit, loss, acc
+              del  _label, label, logit, loss, x, seg_out, attn
               torch.cuda.empty_cache()
   
   
@@ -150,35 +163,11 @@ def main(dataset, model, key):
               'attention/epoch_class_std': epoch_averages['class_attention_std'],
               'attention/epoch_activation_consistency': epoch_averages['activation_consistency']
           })
+          
   
           if epoch_averages['accuracy'] > best_acc:
             best_acc = epoch_averages['accuracy']
             torch.save(model.state_dict(), './model_not_pretrained.pth')
-  
-          # conf = torch.max(nn.functional.softmax(seg_out, dim=1), dim=1)[0]
-          # hue = (torch.argmax(seg_out, dim=1).float() + 0.5)/10
-          # x -= x.min()
-          # x /= x.max()
-          # gs_im = x.mean(1)
-          # gs_mean = gs_im.mean()
-          # gs_min = gs_im.min()
-          # gs_max = torch.max((gs_im-gs_min))
-          # gs_im = (gs_im - gs_min)/gs_max
-          # hsv_im = torch.stack((hue.float(), attn.squeeze().float(), gs_im.float()), -1)
-          # im = hsv_to_rgb(hsv_im.cpu().detach().numpy())
-          # ex = make_grid(torch.tensor(im).permute(0,3,1,2), normalize=True, nrow=25)
-          # attns = make_grid(attn, normalize=False, nrow=25)
-          # attns = attns.cpu().detach()
-          # inputs = make_grid(x, normalize=True, nrow=25).cpu().detach()
-          # display.clear_output(wait=True)
-          # plt.figure(figsize=(20,8))
-          # plt.imshow(np.concatenate((inputs.numpy().transpose(1,2,0),ex.numpy().transpose(1,2,0), attns.numpy().transpose(1,2,0)), axis=0))
-  
-          # plt.xticks(np.linspace(18,324,10), classes)
-          # plt.xticks(fontsize=20)
-          # plt.yticks([])
-          # plt.title('CIFAR10 Epoch:{:02d}, Train:{:.3f}, Test:{:.3f}'.format(epoch, avg_acc, epoch_averages['accuracy']), fontsize=20)
-          # display.display(plt.gcf())
   
           torch.cuda.empty_cache()
           gc.collect()
