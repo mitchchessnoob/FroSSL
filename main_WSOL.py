@@ -25,7 +25,7 @@ import gc
 import wandb
 import argparse
 from WSOL.utils import dataloader, WSOL_model, attention, calculate_attention_metrics, safe_tensor_to_numpy
-
+from WSOL.get_model import get_model
 def main(dataset, model, key):
   train_iter, test_iter, classes = dataloader(dataset)
   model = WSOL_model(model, dataset)
@@ -181,6 +181,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run semi-supervised training.")
     parser.add_argument("--dataset", type=str, required=True, help="Path to the configuration file.")
     parser.add_argument("--key", type=str, required=True, help="WandB API key.")
-    model = resnet18(pretrained=False)
+    parser.add_argument("--ckpt_path", type=str, required=False, help="Checkpoint for presaved model")
+    parser.add_argument("--type", type=str, required=True, help="Model required")
+    
+    
     args = parser.parse_args()
+    model = get_model
     main(args.dataset, model, args.key)
