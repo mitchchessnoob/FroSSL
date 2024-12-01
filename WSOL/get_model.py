@@ -11,7 +11,7 @@ from solo.utils.checkpointer import Checkpointer
 from solo.utils.checkpointer import Checkpointer
 from solo.args.linear import parse_cfg
 
-def get_model(type, ckpt_path = None, dataset = None):
+def get_model(type, dataset, ckpt_path = None):
   if type == "pretrained":
     return resnet18(pretrained=True)
   elif type == "not pretrained":
