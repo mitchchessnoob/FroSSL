@@ -190,8 +190,7 @@ def main(dataset, model, key):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run semi-supervised training.")
     parser.add_argument("--dataset", type=str, required=True, help="Path to the configuration file.")
-    parser.add_argument("--model", required=True, help="Base model")
     parser.add_argument("--key", type=str, required=True, help="WandB API key.")
-    
+    model = resnet18(pretrained=False)
     args = parser.parse_args()
-    main(args.dataset, args.model, args.key)
+    main(args.dataset, model, args.key)
