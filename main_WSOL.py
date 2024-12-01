@@ -194,4 +194,4 @@ if __name__ == '__main__':
     parser.add_argument("--key", type=str, required=True, help="WandB API key.")
     
     args = parser.parse_args()
-    main(args.config_path, args.augments_path, args.key)
+    main(args.dataset, args.model, args.key)
