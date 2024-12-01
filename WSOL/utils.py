@@ -23,7 +23,7 @@ import warnings
 from matplotlib import rc
 import gc
 
-def dataloader(str: dataset)
+def dataloader(str: dataset):
   if dataset == "cifar10":
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=8),
