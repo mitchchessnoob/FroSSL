@@ -125,15 +125,15 @@ def main(dataset, model, key):
               
               # Log step metrics to wandb
               wandb.log({
-                  'test/step_loss': loss.item(),
-                  'test/step_accuracy': accuracy.item(),
-                  'attention/step_mean_coverage': attention_stats['mean_coverage'],
-                  'attention/step_peak_response': attention_stats['peak_response'],
-                  'attention/step_smoothness': attention_stats['smoothness'],
-                  'attention/step_peak_to_background': attention_stats['peak_to_background'],
-                  'attention/step_contiguity': attention_stats['attention_contiguity'],
-                  'attention/step_class_std': attention_stats['class_attention_std'],
-                  'attention/step_activation_consistency': attention_stats['activation_consistency']
+                  'step_loss': loss.item(),
+                  'step_accuracy': accuracy.item(),
+                  'step_mean_coverage': attention_stats['mean_coverage'],
+                  'step_peak_response': attention_stats['peak_response'],
+                  'step_smoothness': attention_stats['smoothness'],
+                  'step_peak_to_background': attention_stats['peak_to_background'],
+                  'step_contiguity': attention_stats['attention_contiguity'],
+                  'step_class_std': attention_stats['class_attention_std'],
+                  'step_activation_consistency': attention_stats['activation_consistency']
               })
               for key in attention_stats:
                   epoch_metrics[key].append(attention_stats[key])
@@ -154,15 +154,15 @@ def main(dataset, model, key):
           # Log epoch metrics to wandb
           wandb.log({
               'epoch': epoch,
-              'test/epoch_loss': epoch_averages['loss'],
-              'test/epoch_accuracy': epoch_averages['accuracy'],
-              'attention/epoch_mean_coverage': epoch_averages['mean_coverage'],
-              'attention/epoch_peak_response': epoch_averages['peak_response'],
-              'attention/epoch_smoothness': epoch_averages['smoothness'],
-              'attention/epoch_peak_to_background': epoch_averages['peak_to_background'],
-              'attention/epoch_contiguity': epoch_averages['attention_contiguity'],
-              'attention/epoch_class_std': epoch_averages['class_attention_std'],
-              'attention/epoch_activation_consistency': epoch_averages['activation_consistency']
+              'epoch_loss': epoch_averages['loss'],
+              'epoch_accuracy': epoch_averages['accuracy'],
+              'epoch_mean_coverage': epoch_averages['mean_coverage'],
+              'epoch_peak_response': epoch_averages['peak_response'],
+              'epoch_smoothness': epoch_averages['smoothness'],
+              'epoch_peak_to_background': epoch_averages['peak_to_background'],
+              'epoch_contiguity': epoch_averages['attention_contiguity'],
+              'epoch_class_std': epoch_averages['class_attention_std'],
+              'epoch_activation_consistency': epoch_averages['activation_consistency']
           })
           
   
