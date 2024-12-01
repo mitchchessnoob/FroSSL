@@ -57,6 +57,7 @@ def main(dataset, model, key):
           epoch_loss = 0.0
           acc = 0.0
           var = 0.0
+          seen = 0
           model.train()
           train_pbar = train_iter
           for i, (x, _label) in enumerate(train_pbar):
@@ -75,7 +76,7 @@ def main(dataset, model, key):
               lr_scheduler.step()
               epoch_loss += loss.item()
               acc += (logit.argmax(-1)==_label).sum()
-  
+              seen += len(_label)
               wandb.log({
                 'train_loss_step': loss,
                 'train_accuracy_step': acc/(i*len(_label))
@@ -85,7 +86,7 @@ def main(dataset, model, key):
   
           avg_loss = epoch_loss / (i + 1)
           losses.append(avg_loss)
-          avg_acc = acc.cpu().detach().numpy() / (len(trainset))
+          avg_acc = acc.cpu().detach().numpy() / seen
           acces.append(avg_acc)
           wandb.log({
                 'epoch': epoch,
