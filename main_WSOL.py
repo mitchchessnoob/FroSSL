@@ -186,5 +186,5 @@ if __name__ == '__main__':
     
     
     args = parser.parse_args()
-    model = get_model
+    model = get_model(args.type, args.dataset, args.ckpt_path)
     main(args.dataset, model, args.key)
