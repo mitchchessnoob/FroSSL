@@ -17,9 +17,9 @@ def get_model(type, dataset, ckpt_path = None):
   elif type == "not pretrained":
     return resnet18(pretrained=False)
   elif type == "FroSSL":
-      if dataset = "cifar1"
+      if dataset == "cifar10":
         cfg = "/content/FroSSL/scripts/pretrain/cifar/frossl.yaml"
-      elif dataset = "STL10":
+      elif dataset == "STL10":
         cfg = "/content/FroSSL/scripts/pretrain/stl10/frossl.yaml"
     
       cfg = OmegaConf.load(cfg)
@@ -49,4 +49,4 @@ def get_model(type, dataset, ckpt_path = None):
           del state[k]
       model.load_state_dict(state, strict=False)
       return model
-    exit("model not allowed")
+  exit("model not allowed")
