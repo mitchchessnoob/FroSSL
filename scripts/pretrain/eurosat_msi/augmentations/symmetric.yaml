@@ -19,12 +19,12 @@
     prob: 0.0
   # all channel transfromations
   noise:
-    sigma: 0
+    sigma: 0.01
   gaussian_filter: 
     prob: 0
     sigma: 0
   rotation:
-    max: 45
+    max: 30
   perspective:
     distortion: 0
     prob: 0
