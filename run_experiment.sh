@@ -1,6 +1,6 @@
 echo "run experiments."
 
-EXPERIMENT_NAME="eurosat_no_augm"
+EXPERIMENT_NAME="eurosat_asym_augm_noise"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
 CONFIG_NAME="frossl_hat"
@@ -25,4 +25,4 @@ python3 -u main_linear.py \
     ++data.dataset="$DATASET" \
     ++name="$EXPERIMENT_NAME-linear-$TRAINED_CHECKPOINT_WANDB_ID" \
 
-echo "done
+echo "done"
