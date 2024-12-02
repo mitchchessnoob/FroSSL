@@ -352,7 +352,7 @@ def build_transform_pipeline(dataset, cfg):
             augmentations.append(transforms.RandomApply([transforms.Lambda(lambda x: torch.tensor(gaussian_filter(x, cfg.gaussian_filter.sigma)))], p=cfg.gaussian_filter.prob))
 
         if cfg.noise.sigma:
-            augmentations.append(transforms.Lambda(lambda x: x + torch.rand(x.shape)*x.std(dim=(1, 2)).reshape(13, 1, 1)*cfg.noise.sigma))
+            augmentations.append(transforms.Lambda(lambda x: x + torch.rand(x.shape)*torch.tensor(std).reshape(13, 1, 1)*cfg.noise.sigma))#x.std(dim=(1, 2))
 
         if cfg.rotation.max:
             augmentations.append(transforms.RandomRotation(degrees=cfg.rotation.max))
