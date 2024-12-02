@@ -19,7 +19,7 @@
     prob: 0.0
   # all channel transfromations
   noise:
-    sigma: 0.05
+    sigma: 0.1
   gaussian_filter: 
     prob: 0
     sigma: 0
