@@ -26,12 +26,12 @@
 #     ++name="$EXPERIMENT_NAME-linear-$TRAINED_CHECKPOINT_WANDB_ID" \
 
 
-echo "run ivne."
+echo "run barlow."
 
-EXPERIMENT_NAME="ivne_eurosat"
+EXPERIMENT_NAME="barlow_eurosat"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
-CONFIG_NAME="ivne"
+CONFIG_NAME="barlow"
 
 
 python3 -u main_pretrain.py \
