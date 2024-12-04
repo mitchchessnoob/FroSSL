@@ -26,12 +26,12 @@
 #     ++name="$EXPERIMENT_NAME-linear-$TRAINED_CHECKPOINT_WANDB_ID" \
 
 
-echo "run barlow."
+echo "run simclr."
 
-EXPERIMENT_NAME="barlow_eurosat"
+EXPERIMENT_NAME="simclr_eurosat"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
-CONFIG_NAME="barlow"
+CONFIG_NAME="simclr"
 
 
 python3 -u main_pretrain.py \
