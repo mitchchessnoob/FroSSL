@@ -20,7 +20,7 @@ datasets
 *.ckpt
 *.tar
 *.pkl
-last_ckpt.txt
+#last_ckpt.txt
 tests.ipynb
 
 bash_files/*.png

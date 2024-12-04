@@ -3,15 +3,15 @@ echo "run experiments."
 EXPERIMENT_NAME="eurosat_sym_inv14_longrun"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
-CONFIG_NAME="frossl_hat"
+CONFIG_NAME="frossl_finetune"
 
 
-python3 -u main_pretrain.py \
-    --config-path "scripts/pretrain/eurosat_msi" \
-    --config-name "$CONFIG_NAME" \
-    ++name="$EXPERIMENT_NAME-pretrain" \
-    ++backbone.name="$BACKBONE"  \
-    ++data.dataset="$DATASET" 
+# python3 -u main_pretrain.py \
+#     --config-path "scripts/pretrain/eurosat_msi" \
+#     --config-name "$CONFIG_NAME" \
+#     ++name="$EXPERIMENT_NAME-pretrain" \
+#     ++backbone.name="$BACKBONE"  \
+#     ++data.dataset="$DATASET" 
 
 # get pretrained path from last_ckpt.txt file
 TRAINED_CHECKPOINT_PATH=$(cat last_ckpt.txt)

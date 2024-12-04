@@ -1,0 +1,1 @@
+trained_models/frossl/model0312/eurosat_sym_inv14_longrun-pretrain-rmkgwn40-ep=399.ckpt
