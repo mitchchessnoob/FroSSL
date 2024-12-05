@@ -1,6 +1,6 @@
 echo "run frossl experiment."
 
-EXPERIMENT_NAME="eurosat_mv4"
+EXPERIMENT_NAME="eurosat_rotation45"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
 CONFIG_NAME="frossl_hat"

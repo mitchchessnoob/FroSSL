@@ -24,7 +24,7 @@
     prob: 0
     sigma: 0
   rotation:
-    max: 30
+    max: 45
   perspective:
     distortion: 0
     prob: 0
@@ -33,4 +33,4 @@
   horizontal_flip:
     prob: 0.5
   crop_size: 64
-  num_crops: 4
+  num_crops:  2
