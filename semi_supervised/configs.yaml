@@ -24,9 +24,9 @@ method_kwargs:
 
 data:
   dataset: office31 # change here for cifar100
-  labeled_path: "/content/office31/Office31/Office31_webcam"
-  unlabeled_path: "/content/office31/Office31/Office31_amazon_flat"
-  test_path: "/content/office31/Office31/Office31_dslr"
+  labeled_path: "./Office31_webcam"
+  unlabeled_path: "./Office31_amazon_flat"
+  test_path: "./Office31_dslr"
   train_path: "./datasets"
   val_path: "./datasets"
   format: "image_folder"
