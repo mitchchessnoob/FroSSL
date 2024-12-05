@@ -1,19 +1,19 @@
-echo "run experiments."
+echo "run frossl experiment."
 
-EXPERIMENT_NAME="eurosat_sym_inv14_longrun"
+EXPERIMENT_NAME="eurosat_mv4"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
-CONFIG_NAME="frossl_finetune"
+CONFIG_NAME="frossl_hat"
 
 
-# python3 -u main_pretrain.py \
-#     --config-path "scripts/pretrain/eurosat_msi" \
-#     --config-name "$CONFIG_NAME" \
-#     ++name="$EXPERIMENT_NAME-pretrain" \
-#     ++backbone.name="$BACKBONE"  \
-#     ++data.dataset="$DATASET" 
+python3 -u main_pretrain.py \
+    --config-path "scripts/pretrain/eurosat_msi" \
+    --config-name "$CONFIG_NAME" \
+    ++name="$EXPERIMENT_NAME-pretrain" \
+    ++backbone.name="$BACKBONE"  \
+    ++data.dataset="$DATASET" 
 
-# get pretrained path from last_ckpt.txt file
+get pretrained path from last_ckpt.txt file
 TRAINED_CHECKPOINT_PATH=$(cat last_ckpt.txt)
 TRAINED_CHECKPOINT_WANDB_ID=$(echo $TRAINED_CHECKPOINT_PATH | awk -F '/' '{print $3}')
 echo "$TRAINED_CHECKPOINT_WANDB_ID $TRAINED_CHECKPOINT_PATH"
