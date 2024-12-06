@@ -23,7 +23,7 @@ method_kwargs:
   invariance_weight: 1.4
 
 data:
-  dataset: eurosat # change here for cifar100
+  dataset: eurosat_msi # change here for cifar100
   train_path: "./datasets"
   val_path: "./datasets"
   format: "image_folder"
