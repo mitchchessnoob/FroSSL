@@ -1,0 +1,73 @@
+- rrc:
+    enabled: True
+    crop_min_scale: 0.08
+    crop_max_scale: 1.0
+  # rgb transfromations
+  color_jitter:
+    prob: 0
+    brightness: 0
+    contrast: 0
+    saturation: 0
+    hue: 0
+  grayscale:
+    prob: 0
+  gaussian_blur:
+    prob: 0.0
+  solarization:
+    prob: 0.0
+  equalization:
+    prob: 0.0
+  # all channel transfromations
+  noise:
+    sigma: 0.01
+  gaussian_filter: 
+    prob: 0
+    sigma: 0
+  rotation:
+    max: 30
+  perspective:
+    distortion: 0
+    prob: 0
+  vertical_flip:
+    prob: 0.5
+  horizontal_flip:
+    prob: 0.5
+  crop_size: 64
+  num_crops:  2
+
+- rrc:
+    enabled: True
+    crop_min_scale: 0.08
+    crop_max_scale: 1.0
+  # rgb transfromations
+  color_jitter:
+    prob: 0
+    brightness: 0
+    contrast: 0
+    saturation: 0
+    hue: 0
+  grayscale:
+    prob: 0
+  gaussian_blur:
+    prob: 0.0
+  solarization:
+    prob: 0.0
+  equalization:
+    prob: 0.0
+  # all channel transfromations
+  noise:
+    sigma: 0.01
+  gaussian_filter: 
+    prob: 0
+    sigma: 0
+  rotation:
+    max: 30
+  perspective:
+    distortion: 0
+    prob: 0
+  vertical_flip:
+    prob: 0.5
+  horizontal_flip:
+    prob: 0.5
+  crop_size: 32
+  num_crops:  4

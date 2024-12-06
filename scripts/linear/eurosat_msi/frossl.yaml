@@ -14,7 +14,7 @@ name: "frossl-eurosat" # change here for cifar100
 pretrain_method: "frossl"
 
 backbone:
-  name: "resnet18"
+  name: "resnet50"
 method_kwargs:
   proj_hidden_dim: 2048
   proj_output_dim: 1024
@@ -43,7 +43,7 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-max_epochs: 20
+max_epochs: 1
 devices: [0]
 sync_batchnorm: True
 accelerator: "gpu"

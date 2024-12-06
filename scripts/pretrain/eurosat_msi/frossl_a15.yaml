@@ -18,7 +18,7 @@ backbone:
 method_kwargs:
   proj_hidden_dim: 2048
   proj_output_dim: 1024
-  alpha: 2
+  alpha: 1.5
   kernel_type: "linear"
   invariance_weight: 1.4
 
@@ -48,7 +48,7 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-max_epochs: 1
+max_epochs: 100
 devices: [0]
 sync_batchnorm: True
 accelerator: "gpu" 

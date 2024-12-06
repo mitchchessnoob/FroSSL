@@ -61,7 +61,7 @@ def main(cfg: DictConfig):
         with open("last_ckpt.txt", "r") as f:
             ckpt_path = f.read().strip()
         # delete last_ckpt file
-        #os.remove("last_ckpt.txt")
+        os.remove("last_ckpt.txt")
     print(ckpt_path)
     assert ckpt_path.endswith(".ckpt") or ckpt_path.endswith(".pth") or ckpt_path.endswith(".pt")
 
@@ -229,6 +229,13 @@ def main(cfg: DictConfig):
     else:
         trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
 
+
+
+    with open("last_ckpt.txt", "w") as f:
+        if hasattr(ckpt, "last_ckpt"):
+            f.write(str(ckpt.last_ckpt))
+        else:
+            f.write(str(ckpt_path))
 
 if __name__ == "__main__":
     main()

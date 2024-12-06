@@ -24,7 +24,7 @@
     prob: 0
     sigma: 0
   rotation:
-    max: 30
+    max: 45
   perspective:
     distortion: 0
     prob: 0
