@@ -61,7 +61,7 @@ def main(cfg: DictConfig):
         with open("last_ckpt.txt", "r") as f:
             ckpt_path = f.read().strip()
         # delete last_ckpt file
-        os.remove("last_ckpt.txt")
+        #os.remove("last_ckpt.txt")
     print(ckpt_path)
     assert ckpt_path.endswith(".ckpt") or ckpt_path.endswith(".pth") or ckpt_path.endswith(".pt")
 
