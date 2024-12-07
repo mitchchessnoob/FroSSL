@@ -310,12 +310,7 @@ def prepare_test_data(
     """
 
     #_, T_test = prepare_transforms(dataset)
-    T_test = transforms.Compose(
-            [   transforms.Lambda(lambda x: x.permute(2, 0, 1)),
-                transforms.Lambda(lambda x: x/10_000),
-                transforms.Normalize((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
-                                     (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)),
-            ])
+
     # if auto_augment:
     #     T_train = create_transform(
     #         input_size=224,
@@ -329,19 +324,41 @@ def prepare_test_data(
     #         mean=IMAGENET_DEFAULT_MEAN,
     #         std=IMAGENET_DEFAULT_STD,
     #     )
+    if dataset == "eurosat_msi":
+        T_test = transforms.Compose(
+            [   transforms.Lambda(lambda x: x.permute(2, 0, 1)),
+                transforms.Lambda(lambda x: x/10_000),
+                transforms.Normalize((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
+                                     (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)),
+            ])
+        test_dataset = load_dataset("blanchon/EuroSAT_MSI", split="test")
+        test_dataset.set_format("torch", columns=["image", "label"])
+        # transform into a torch Dataset
+        test_dataset = EuroSATDataset(test_dataset, transform=T_test)
 
-    test_dataset = load_dataset("blanchon/EuroSAT_MSI", split="test")
-    test_dataset.set_format("torch", columns=["image", "label"])
-    # transform into a torch Dataset
-    test_dataset = EuroSATDataset(test_dataset, transform=T_test)
-
-    test_loader = DataLoader(
-        test_dataset,
-        batch_size=5400,
-        num_workers=0,
-        pin_memory=False,
-        drop_last=False,
-    )
+        test_loader = DataLoader(
+            test_dataset,
+            batch_size=5400,
+            num_workers=0,
+            pin_memory=False,
+            drop_last=False,
+        )
+    elif dataset=="mit67":
+        T_test= transforms.Compose(
+            [
+                transforms.Resize(224),  # resize shorter
+                transforms.CenterCrop(224),  # take center crop
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.4887, 0.4314, 0.3724), std=(0.2378, 0.2332, 0.2292)),
+            ])
+        test_dataset = torchvision.datasets.ImageFolder(root=val_data_path, transform=T_test)
+        test_loader = DataLoader(
+                test_dataset,
+                batch_size=len(test_dataset),
+                num_workers=0,
+                pin_memory=False,
+                drop_last=False,
+            )
 
 
     # if precompute_features:
