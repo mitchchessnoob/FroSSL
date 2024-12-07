@@ -1,1 +1,2 @@
-
+export KAGGLE_USERNAME=your_username
+export KAGGLE_KEY=your_api_key
