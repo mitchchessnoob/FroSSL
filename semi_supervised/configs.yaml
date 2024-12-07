@@ -25,11 +25,9 @@ method_kwargs:
 data:
   dataset: office31 # change here for cifar100
   labeled_path: "./Office31_webcam"
-  unlabeled_path: "./Office31_amazon_flat"
+  unlabeled_path: "./Office31_amazon"
   test_path: "./Office31_dslr"
   train_path: "./datasets"
-  val_path: "./datasets"
-  format: "image_folder"
   num_workers: 2 #original was 8
 optimizer:
   name: "lars"
