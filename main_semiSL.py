@@ -14,6 +14,7 @@ from solo.data.pretrain_dataloader import (
     prepare_n_crop_transform
 )
 from semi_supervised.utils.evaluate import evaluate
+from semi_supervised.utils.dataset_download import dataset
 from semi_supervised.utils.model import SSLModel
 from semi_supervised.utils.train_step import train_step
 from semi_supervised.utils.optim_sch import create_optimizer_and_scheduler
