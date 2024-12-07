@@ -41,7 +41,7 @@ def main(configs_path, augments_path, key):
         # Create CfgNode
         augments = OmegaConf.create(yaml_data)
         # Initialize wandb
-        wandb.init(project=configs.name, config=configs, name = f"semiSL with weight {configs.ssl_weight}")
+        wandb.init(project=configs.name, config=configs)
 
         # Set device
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
