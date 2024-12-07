@@ -10,7 +10,8 @@ hydra:
   run:
     dir: .
 
-name: "ivne-eurosat-linear"
+finetune: True
+name: "ivne-eurosat-finetune"
 pretrained_feature_extractor: None
 backbone:
   name: "resnet50"
