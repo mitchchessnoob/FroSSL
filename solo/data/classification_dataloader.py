@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Callable, Optional, Tuple, Union
 
 import torchvision
+from torchvision import datasets
 from timm.data import create_transform
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torch import nn
@@ -32,6 +33,7 @@ from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
 from torchvision.datasets import STL10, ImageFolder, EuroSAT
 from datasets import load_dataset
+from sklearn.model_selection import train_test_split
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -58,6 +60,31 @@ class EuroSATDataset(Dataset):
             image = self.transform(image)
         
         return image, label
+
+
+def make_train_val_split(dataset):
+        targets = dataset.targets
+        # Get the class indices for each class
+        class_indices = {}
+        for idx, target in enumerate(targets):
+            if target not in class_indices:
+                class_indices[target] = []
+            class_indices[target].append(idx)
+
+        # Initialize lists to store the split indices
+        train_indices = []
+        val_indices = []
+
+        # Split each class's indices into train and validation sets (e.g., 80/20 split)
+        for class_label, indices in class_indices.items():
+            train_idx, val_idx = train_test_split(indices, test_size=0.1, random_state=42)
+            train_indices.extend(train_idx)
+            val_indices.extend(val_idx)
+
+        # Create train and validation subsets using the indices
+        train_dataset = torch.utils.data.Subset(dataset, train_indices)
+        val_dataset = torch.utils.data.Subset(dataset, val_indices)
+        return train_dataset, val_dataset
 
 
 def build_custom_pipeline():
@@ -209,6 +236,27 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         ),
     }
 
+
+    mit67_pipeline = { 
+        "T_train": transforms.Compose(
+            [
+                transforms.RandomResizedCrop(size=224, scale=(0.08, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.4887, 0.4314, 0.3724), std=(0.2378, 0.2332, 0.2292)),
+            ]
+        ),
+        "T_val": transforms.Compose(
+            [
+                transforms.Resize(224),  # resize shorter
+                transforms.CenterCrop(224),  # take center crop
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.4887, 0.4314, 0.3724), std=(0.2378, 0.2332, 0.2292)),
+            ]
+        ),
+    }
+
+
     custom_pipeline = build_custom_pipeline()
 
     pipelines = {
@@ -220,7 +268,8 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         "tiny-imagenet": tiny_imagenet_pipeline,
         "custom": custom_pipeline,
         "eurosat_rgb": eurosat_rgb_pipeline,
-        "eurosat_msi": eurosat_msi_pipeline
+        "eurosat_msi": eurosat_msi_pipeline,
+        "mit67": mit67_pipeline
     }
 
     assert dataset in pipelines
@@ -317,11 +366,16 @@ def prepare_datasets(
             val_dataset.set_format("torch", columns=["image", "label"])
         else:
             pass
-
         # transform into a torch Dataset
         train_dataset = EuroSATDataset(train_dataset, transform=T_train)
         val_dataset = EuroSATDataset(val_dataset, transform=T_val)
 
+    elif dataset=="mit67":
+        # ImageFolder lädt das Dataset automatisch basierend auf der Ordnerstruktur
+        t_dataset = datasets.ImageFolder(root=train_data_path, transform=T_train)
+        train_dataset, val_dataset = make_train_val_split(t_dataset)
+
+    
     elif dataset in ["imagenet", "imagenet100", "custom", "tiny-imagenet"]:
         if data_format == "h5":
             assert _h5_available
@@ -341,7 +395,7 @@ def prepare_datasets(
 
         files, _, labels, _ = train_test_split(
             files, labels, train_size=data_fraction, stratify=labels, random_state=42
-        )
+        ) 
         train_dataset.samples = [tuple(p) for p in zip(files, labels)]
 
     return train_dataset, val_dataset
