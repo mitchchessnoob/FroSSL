@@ -35,7 +35,4 @@ def flatten_image_directory(source_dir, target_dir):
 
     print(f"All images have been copied to {target_dir}.")
 
-# Example usage
-source_directory = "/content/office31/Office31/Office31_amazon" # Replace with the path to your structured folder
-target_directory = "/content/office31/Office31/Office31_amazon_flat"  # Replace with the path to your target folder
-flatten_image_directory(source_directory, target_directory)
+
