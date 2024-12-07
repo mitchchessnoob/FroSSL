@@ -37,7 +37,7 @@ def main(configs_path, augments_path, key):
 
         with open(augments_path, "r") as f:
           yaml_data = f.read()
-
+        dataset()
         # Create CfgNode
         augments = OmegaConf.create(yaml_data)
         # Initialize wandb
