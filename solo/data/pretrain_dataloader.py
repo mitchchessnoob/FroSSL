@@ -257,7 +257,8 @@ def build_transform_pipeline(dataset, cfg):
         "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         "eurosat_rgb": ((0.3127, 0.3451, 0.3703), (0.1914, 0.1270, 0.1067)),
         "eurosat_msi": ((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
-                        (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232))
+                        (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)),
+        "mit67": ((0.4887, 0.4314, 0.3724), (0.2378, 0.2332, 0.2292))
     }
 
     mean, std = MEANS_N_STD.get(
@@ -448,6 +449,11 @@ def prepare_datasets(
         else:
             pass
         train_dataset = eurosatdataset_with_index()(train_dataset, transform)
+    
+    elif dataset=="mit67":
+        # ImageFolder lädt das Dataset automatisch basierend auf der Ordnerstruktur
+        train_dataset = dataset_with_index(ImageFolder)(root=train_data_path, transform=transform)
+
 
     elif dataset in ["imagenet", "imagenet100", "tiny-imagenet"]:
         if data_format == "h5":
