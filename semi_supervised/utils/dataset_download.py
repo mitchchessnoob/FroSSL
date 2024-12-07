@@ -1,6 +1,6 @@
 import kagglehub
 import shutil
-def dataset()
+def dataset():
   # Download latest version
   path = kagglehub.dataset_download("mei1963/office31")
 
