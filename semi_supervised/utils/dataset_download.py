@@ -6,6 +6,6 @@ def dataset():
 
 
   destination_path = '.'
-  
+  shutil.rmtree(destination_path)
   # Move the folder
   shutil.move(path, destination_path)
