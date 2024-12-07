@@ -6,6 +6,7 @@ def dataset():
 
 
   destination_path = './1'
-  shutil.rmtree(destination_path)
+  print(f"attempting to remove {destination_path}")
+  shutil.rmtree(destination_path, ignore_errors=True)
   # Move the folder
   shutil.move(path, destination_path)
