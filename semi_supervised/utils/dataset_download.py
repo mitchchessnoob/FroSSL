@@ -5,7 +5,7 @@ def dataset():
   path = kagglehub.dataset_download("mei1963/office31")
 
 
-  destination_path = '.'
+  destination_path = './1'
   shutil.rmtree(destination_path)
   # Move the folder
   shutil.move(path, destination_path)
