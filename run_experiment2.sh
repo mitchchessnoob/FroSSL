@@ -2,7 +2,7 @@
 EXPERIMENT_NAME="mit67_initial"
 DATASET="mit67"
 BACKBONE="resnet50" 
-CONFIG_NAME="frossl"
+CONFIG_NAME="frossl_sym"
 
 echo "run $CONFIG_NAME experiment with $DATASET."
 
