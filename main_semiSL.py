@@ -28,10 +28,8 @@ from omegaconf import OmegaConf
 import wandb
 import numpy as np
 
-def main(configs_path, augments_path, key):
+def main(configs_path, augments_path):
     try:
-        if wandb.api.api_key is None:
-          wandb.login(key=key)
         cfg = OmegaConf.load(configs_path)
         configs = parse_cfg(cfg)
 
@@ -141,7 +139,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run semi-supervised training.")
     parser.add_argument("--config_path", type=str, required=True, help="Path to the configuration file.")
     parser.add_argument("--augments_path", type=str, required=True, help="Path to the augmentations file.")
-    parser.add_argument("--key", type=str, required=True, help="WandB API key.")
     
     args = parser.parse_args()
-    main(args.config_path, args.augments_path, args.key)
+    main(args.config_path, args.augments_path)
