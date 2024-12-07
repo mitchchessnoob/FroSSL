@@ -1,4 +1,3 @@
-from dataclasses import asdict
 import sys
 import argparse
 import os
@@ -41,9 +40,9 @@ def main(configs_path, augments_path, key):
         dataset()
         # Create CfgNode
         augments = OmegaConf.create(yaml_data)
-        configs_dict = asdict(configs)
+        
         # Initialize wandb
-        wandb.init(project=configs.name, config=configs_dict)
+        wandb.init(project=configs.name, config=configs)
 
         # Set device
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
