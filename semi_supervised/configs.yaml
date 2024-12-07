@@ -32,7 +32,7 @@ data:
 optimizer:
   name: "lars"
   batch_size: 64
-  lr: 0.003
+  lr: 0.005
   classifier_lr: 0.1
   weight_decay: 1e-4
   kwargs:
@@ -41,7 +41,7 @@ optimizer:
     exclude_bias_n_norm: True
 scheduler:
   name: "warmup_cosine"
-  warmup_epochs: 10
+  warmup_epochs: 20
 checkpoint:
   enabled: True
   dir: "trained_models"
@@ -50,7 +50,7 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-ssl_weight: 1
+ssl_weight: 3
 max_epochs: 200
 devices: [0]
 sync_batchnorm: True
