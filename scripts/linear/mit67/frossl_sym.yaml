@@ -29,7 +29,7 @@ data:
   num_workers: 8
 optimizer:
   name: "adam"
-  batch_size: 128
+  batch_size: 64
   lr: 0.001
   weight_decay: 0
 scheduler:
@@ -43,7 +43,7 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-max_epochs: 1
+max_epochs: 70
 devices: [0]
 sync_batchnorm: True
 accelerator: "gpu"
