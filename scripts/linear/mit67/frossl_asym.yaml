@@ -26,10 +26,10 @@ data:
   train_path: "./datasets/mit67/train_images"
   val_path: "./datasets/mit67/test_images"
   format: "image_folder"
-  num_workers: 8
+  num_workers: 16
 optimizer:
   name: "adam"
-  batch_size: 64
+  batch_size: 256
   lr: 0.001
   weight_decay: 0
 scheduler:
@@ -43,7 +43,7 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-max_epochs: 70
+max_epochs: 1
 devices: [0]
 sync_batchnorm: True
 accelerator: "gpu"

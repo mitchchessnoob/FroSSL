@@ -235,9 +235,16 @@ def main(config_path, rel_model_path=None):#='scripts/linear/eurosat_msi/frossl_
     #     trainer.fit(model, ckpt_path=ckpt_path, datamodule=dali_datamodule)
     # else:
     #     trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
-    metrics = []
-    for batch in test_loader:
-        metrics= model.test_step(batch, batch_idx=None, update_validation_step_outputs=False)
+    metrics = [] 
+    for idx, batch in enumerate(test_loader):
+        if idx == 0:
+            metrics = model.test_step(batch, batch_idx=None, update_validation_step_outputs=False)
+        else:
+            metric = model.test_step(batch, batch_idx=None, update_validation_step_outputs=False)
+            for k, item in metrics.items():
+                item.append(metric[k])
+    for k, item in metrics.items():
+        metrics[k] = sum(item)/len(idx+1)
     wandb.init(project="eurosat_msi_test_accuracies", name=ckpt_path, mode="online")
     wandb.log(metrics)
     wandb.finish()
