@@ -40,7 +40,7 @@ def main(configs_path, augments_path):
         augments = OmegaConf.create(yaml_data)
         
         # Initialize wandb
-        wandb.init(project=configs.name, name=f"SemiSL without FroSSL")
+        wandb.init(project=configs.name, name=f"SemiSL without FroSSL but same augmentation")
 
         # Set device
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
