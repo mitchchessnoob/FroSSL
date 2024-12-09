@@ -86,11 +86,17 @@ def main(configs_path, augments_path):
         # Create model
         num_classes = len(labeled_dataset.classes)
         model = models.resnet18(pretrained=False).to(device)
-        in_features = model.backbone.fc.in_features
-        model.backbone.fc = nn.Identity()  # Remove final FC layer
 
-        # Add new FC layer for classification
+        # Get the number of input features for the final FC layer
+        in_features = model.fc.in_features
+        
+        # Replace the final FC layer with an identity layer
+        model.fc = nn.Identity()  # Remove the original FC layer
+        
+        # Add a new FC layer for classification
         model.classifier = nn.Linear(in_features, num_classes)
+        
+        # Move the model to the device
         model = model.to(device)
         # Define optimizer and criterion
         optimizer, scheduler = create_optimizer_and_scheduler(model, configs)
