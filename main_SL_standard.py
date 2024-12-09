@@ -13,10 +13,10 @@ from solo.data.pretrain_dataloader import (
     prepare_dataloader,
     prepare_n_crop_transform
 )
-from semi_supervised.utils.evaluate import evaluate
+from semi_supervised.utils.evaluate_std import evaluate
 from semi_supervised.utils.dataset_download import dataset
 from semi_supervised.utils.model import SSLModel
-from semi_supervised.utils.train_step import train_step
+from semi_supervised.utils.train_step_std import train_step
 from semi_supervised.utils.optim_sch import create_optimizer_and_scheduler
 from semi_supervised.utils.unlabeled_dataset import flatten_image_directory
 from solo.data.classification_dataloader import prepare_transforms
@@ -101,10 +101,10 @@ def main(configs_path, augments_path):
         best_acc = 0
 
         for epoch in range(num_epochs):
-            train_loss, train_acc = train_step_std(model, labeled_loader,
+            train_loss, train_acc = train_step(model, labeled_loader,
                                   optimizer, scheduler, criterion, device, epoch, configs)
 
-            test_loss, test_acc = evaluate_std(model, test_loader, criterion, device, epoch)
+            test_loss, test_acc = evaluate(model, test_loader, criterion, device, epoch)
 
             print(f'Epoch: {epoch+1}/{num_epochs}')
             print(f'Train Loss: {train_loss:.4f}')
