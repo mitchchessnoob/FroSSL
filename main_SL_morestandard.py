@@ -115,7 +115,7 @@ def main(configs_path, augments_path):
         #                                 batch_size=configs.optimizer.batch_size, shuffle=False)
 
         # Create model
-        num_classes = len(labeled_dataset.classes)
+        num_classes = len(train_dataset.classes)
         model = models.resnet18(pretrained=False).to(device)
 
         # Get the number of input features for the final FC layer
