@@ -13,7 +13,7 @@ from solo.data.pretrain_dataloader import (
     prepare_dataloader,
     prepare_n_crop_transform
 )
-from semi_supervised.utils.evaluate_std import evaluate
+from semi_supervised.utils.evaluate import evaluate
 from semi_supervised.utils.dataset_download import dataset
 from semi_supervised.utils.model import SSLModel
 from semi_supervised.utils.train_step_std import train_step
