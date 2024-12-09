@@ -10,6 +10,11 @@ AUGMENTS_PATH=scripts/pretrain/office31/augmentations/asymmetric.yaml
 python3 -u main_SL_standard.py \
     --config_path $CONFIGS_PATH \
     --augments_path $AUGMENTS_PATH \
+    
+echo "First done"
 
+python3 -u main_SL_morestandard.py \
+    --config_path $CONFIGS_PATH \
+    --augments_path $AUGMENTS_PATH \
 
 echo "done"
