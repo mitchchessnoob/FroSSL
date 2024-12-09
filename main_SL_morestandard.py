@@ -13,6 +13,9 @@ from solo.data.pretrain_dataloader import (
     prepare_dataloader,
     prepare_n_crop_transform
 )
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+from torchvision.datasets import ImageFolder
 from semi_supervised.utils.evaluate import evaluate
 from semi_supervised.utils.dataset_download import dataset
 from semi_supervised.utils.model import SSLModel
