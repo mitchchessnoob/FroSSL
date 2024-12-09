@@ -7,7 +7,7 @@ CONFIGS_PATH=semi_supervised/configs.yaml
 AUGMENTS_PATH=scripts/pretrain/office31/augmentations/asymmetric.yaml
 
 
-python3 -u main_semiSL_standard.py \
+python3 -u main_SL_standard.py \
     --config_path $CONFIGS_PATH \
     --augments_path $AUGMENTS_PATH \
 
