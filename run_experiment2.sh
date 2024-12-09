@@ -1,7 +1,7 @@
 ############
 
 
-EXPERIMENT_NAME="mit67_asym_bz256"
+EXPERIMENT_NAME="mit67_asym_bz128"
 DATASET="mit67"
 BACKBONE="resnet50" 
 CONFIG_NAME="frossl_asym"
