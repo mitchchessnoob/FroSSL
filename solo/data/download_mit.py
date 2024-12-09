@@ -8,7 +8,7 @@ import kagglehub
 def download_mit_dataset():
 
     path = kagglehub.dataset_download("itsahmad/indoor-scenes-cvpr-2019")
-    path = "/home/hahnffm99/.cache/kagglehub/datasets/itsahmad/indoor-scenes-cvpr-2019/versions/1"
+    #path = "/home/hahnffm99/.cache/kagglehub/datasets/itsahmad/indoor-scenes-cvpr-2019/versions/1"
     print(path)
     current_dir = os.getcwd()
     os.makedirs(current_dir+"/datasets", exist_ok=True)
