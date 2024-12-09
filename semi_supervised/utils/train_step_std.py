@@ -48,10 +48,10 @@ def train_step(model, labeled_loader, optimizer, scheduler, criterion, device, e
     accuracy = 100. * correct / total
     wandb.log({
             'epoch': epoch,
-            'Train_total_loss_epoch': total_loss/len(unlabeled_loader),
+            'Train_total_loss_epoch': total_loss/len(labeled_loader),
             "Train_accuracy_epoch": accuracy
         })
 
     if configs.scheduler.name == "warmup_cosine":
         scheduler.step()
-    return total_loss / len(unlabeled_loader), accuracy
+    return total_loss / len(labeled_loader), accuracy
