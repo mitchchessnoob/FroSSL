@@ -92,7 +92,7 @@ def main(configs_path, augments_path):
         test_dataset = ImageFolder(root=configs.data.test_path, transform=transform_test)
         
         # Create DataLoader for training
-        train_loader = DataLoader(train_dataset, batch_size=configs.optimizer.batch_size, shuffle=True, num_workers=configs.data.num_workers)
+        labeled_loader = DataLoader(train_dataset, batch_size=configs.optimizer.batch_size, shuffle=True, num_workers=configs.data.num_workers)
         
         # Create DataLoader for testing
         test_loader = DataLoader(test_dataset, batch_size=configs.optimizer.batch_size, shuffle=False, num_workers=configs.data.num_workers)
