@@ -85,7 +85,7 @@ def main(configs_path, augments_path):
 
         # Create model
         num_classes = len(labeled_dataset.classes)
-        model = models.resnet18(Pretrained=False).to(device)
+        model = models.resnet18(pretrained=False).to(device)
         in_features = model.backbone.fc.in_features
         model.backbone.fc = nn.Identity()  # Remove final FC layer
 
