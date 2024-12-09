@@ -51,7 +51,7 @@ auto_resume:
 
 # overwrite PL stuff
 ssl_weight: 0.5
-max_epochs: 200
+max_epochs: 400
 devices: [0]
 sync_batchnorm: True
 accelerator: "gpu"
