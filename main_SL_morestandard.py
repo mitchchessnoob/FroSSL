@@ -16,7 +16,7 @@ from solo.data.pretrain_dataloader import (
 from semi_supervised.utils.evaluate import evaluate
 from semi_supervised.utils.dataset_download import dataset
 from semi_supervised.utils.model import SSLModel
-from semi_supervised.utils.train_step_std import train_step
+from semi_supervised.utils.train_step_emstd import train_step
 from semi_supervised.utils.optim_sch import create_optimizer_and_scheduler
 from semi_supervised.utils.unlabeled_dataset import flatten_image_directory
 from solo.data.classification_dataloader import prepare_transforms
