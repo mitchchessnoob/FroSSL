@@ -40,7 +40,7 @@ def main(configs_path, augments_path):
         augments = OmegaConf.create(yaml_data)
         
         # Initialize wandb
-        wandb.init(project=configs.name, name=f"SemiSL FroSSL A/D")
+        wandb.init(project=configs.name, name=f"SemiSL FroSSL W/A")
 
         # Set device
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -126,7 +126,7 @@ def main(configs_path, augments_path):
             os.makedirs(configs.checkpoint.dir, exist_ok=True)
             if test_acc > best_acc and configs.checkpoint.enabled:
                 best_acc = test_acc
-                torch.save(model.state_dict(), f"{configs.checkpoint.dir}/best_model_AD.pth")
+                torch.save(model.state_dict(), f"{configs.checkpoint.dir}/best_model_WA.pth")
 
         # Save final model
         torch.save(model.state_dict(), f"{configs.checkpoint.dir}/final_model.pth")
