@@ -50,7 +50,7 @@ auto_resume:
   enabled: False
 
 # overwrite PL stuff
-ssl_weight: 0.5
+ssl_weight: 0.3
 max_epochs: 400
 devices: [0]
 sync_batchnorm: True
