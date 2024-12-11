@@ -4,7 +4,7 @@ class SSLModel(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         # Load ResNet18 backbone
-        self.backbone = models.resnet18(pretrained=False)
+        self.backbone = models.resnet18(pretrained=True)
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Identity()  # Remove final FC layer
 
