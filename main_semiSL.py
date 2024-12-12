@@ -36,7 +36,7 @@ def main(configs_path, augments_path):
         with open(augments_path, "r") as f:
           yaml_data = f.read()
         dataset()
-        # Create CfgNode
+        # Augmentation pipeline
         augments = OmegaConf.create(yaml_data)
         
         # Initialize wandb
@@ -47,27 +47,28 @@ def main(configs_path, augments_path):
 
 
 
-        # 2. Get the transforms and num_crops from the YAML
+        # Get the transforms and num_crops from the augmentation file
         transforms_list = []
         num_crops_list = []
 
         for config in augments:
-            transform = build_transform_pipeline(configs.data.dataset, config)  # Your existing CustomAugmentation class
+            transform = build_transform_pipeline(configs.data.dataset, config)  
             transforms_list.append(transform)
             num_crops_list.append(config['num_crops'])
 
-        # 3. Create the N-crop transform using the provided function
+        # Create the N-crop transform using function in solo library
         transform = prepare_n_crop_transform(transforms_list, num_crops_list)
         T_train, T_val = prepare_transforms(configs.data.dataset)
 
-        # 4. Use this transform to prepare datasets
+        # Prepare datasets
         labeled_dataset = prepare_datasets(
             dataset= configs.data.dataset,
             transform=transform,
             train_data_path=configs.data.labeled_path,
             data_format='image_folder'
         )
-        
+        #solo dataloader without labels wants a flat directory, but the downloaded datasets are not in this format
+        # we therefore process it 
         proper_format_unlabeled = True
         for item in os.listdir(configs.data.unlabeled_path):
             if os.path.isdir(os.path.join(configs.data.unlabeled_path, item)):
@@ -94,7 +95,7 @@ def main(configs_path, augments_path):
             train_dataset=False
         )
 
-        # 5. Create the dataloaders
+        # Create the dataloaders
         labeled_loader = prepare_dataloader(labeled_dataset, num_workers = configs.data.num_workers,\
                                             batch_size=configs.optimizer.batch_size)
         unlabeled_loader = prepare_dataloader(unlabeled_dataset, num_workers = configs.data.num_workers,\
@@ -106,7 +107,7 @@ def main(configs_path, augments_path):
         num_classes = len(labeled_dataset.classes)
         model = SSLModel(num_classes).to(device)
 
-        # Define optimizer and criterion
+        # Optimizer and criterion
         optimizer, scheduler = create_optimizer_and_scheduler(model, configs)
         criterion = nn.CrossEntropyLoss()
 
