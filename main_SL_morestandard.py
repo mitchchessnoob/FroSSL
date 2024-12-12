@@ -39,7 +39,7 @@ def main(configs_path, augments_path):
         with open(augments_path, "r") as f:
           yaml_data = f.read()
         dataset()
-        # Create CfgNode
+        
         augments = OmegaConf.create(yaml_data)
         
         # Initialize wandb
@@ -49,34 +49,34 @@ def main(configs_path, augments_path):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         transform_train = transforms.Compose([
-                # Randomly adjust brightness, contrast, saturation, and hue
+                
                 transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
             
-                # Randomly flip the image horizontally
+                
                 transforms.RandomHorizontalFlip(p=0.5),
 
-        # Randomly apply affine transformations
+        
                 transforms.RandomAffine(
-                    degrees=10,        # Rotation range
-                    translate=(0.1, 0.1),  # Random translation
-                    scale=(0.9, 1.1),  # Scaling
-                    shear=10           # Shear transformation
+                    degrees=10,        
+                    translate=(0.1, 0.1),  
+                    scale=(0.9, 1.1),  
+                    shear=10           
                 ),
             
-                # Random cropping and resizing
+                
                 transforms.RandomResizedCrop(
-                    size=(224, 224),  # Target size
-                    scale=(0.8, 1.0),  # Random crop scaling
-                    ratio=(0.9, 1.1)   # Aspect ratio variation
+                    size=(224, 224),  
+                    scale=(0.8, 1.0),  
+                    ratio=(0.9, 1.1)   
                 ),
             
-                # Adding random noise or blur (optional)
+                
                 transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 2.0)),
             
-                # Convert image to a tensor
+                
                 transforms.ToTensor(),
             
-                # Normalize the tensor image with mean and std for each channel (adjust as needed)
+                
                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
 
@@ -88,7 +88,7 @@ def main(configs_path, augments_path):
         
         train_dataset = ImageFolder(root=configs.data.labeled_path, transform=transform_train)
 
-        # Load testing dataset (Webcam)
+       
         test_dataset = ImageFolder(root=configs.data.test_path, transform=transform_test)
         
         # Create DataLoader for training
@@ -96,38 +96,18 @@ def main(configs_path, augments_path):
         
         # Create DataLoader for testing
         test_loader = DataLoader(test_dataset, batch_size=configs.optimizer.batch_size, shuffle=False, num_workers=configs.data.num_workers)
-        # 4. Use this transform to prepare datasets
-
-
-        # test_dataset = prepare_datasets(
-        #     dataset=configs.data.dataset,
-        #     transform=T_val,
-        #     train_data_path=configs.data.test_path,
-        #     data_format='image_folder',
-        #     train_dataset=False
-        # )
-
-        # # 5. Create the dataloaders
-        # labeled_loader = prepare_dataloader(labeled_dataset, num_workers = configs.data.num_workers,\
-        #                                     batch_size=configs.optimizer.batch_size)
-
-        # test_loader = prepare_dataloader(test_dataset, num_workers = configs.data.num_workers,\
-        #                                 batch_size=configs.optimizer.batch_size, shuffle=False)
-
+        
         # Create model
         num_classes = len(train_dataset.classes)
         model = models.resnet18(pretrained=True).to(device)
 
-        # Get the number of input features for the final FC layer
         in_features = model.fc.in_features
         
-        # Replace the final FC layer with an identity layer
         model.fc = nn.Identity()  # Remove the original FC layer
         
         # Add a new FC layer for classification
         model.classifier = nn.Linear(in_features, num_classes)
         
-        # Move the model to the device
         model = model.to(device)
         # Define optimizer and criterion
         optimizer, scheduler = create_optimizer_and_scheduler(model, configs)
