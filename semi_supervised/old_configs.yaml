@@ -1,0 +1,59 @@
+defaults:
+  - _self_
+  - augmentations: asymmetric.yaml
+  - wandb: private.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+name: "office31" # change here for cifar100
+method: "frossl"
+backbone:
+  name: "resnet18"
+method_kwargs:
+  proj_hidden_dim: 512
+  proj_output_dim: 256
+  alpha: 2
+  kernel_type: "linear"
+  invariance_weight: 1.4
+
+data:
+  dataset: office31 # change here for cifar100
+  labeled_path: "./1/Office31/Office31_dslr"
+  unlabeled_path: "./1/Office31/Office31_amazon"
+  test_path: "./1/Office31/Office31_webcam"
+  train_path: "./datasets"
+  num_workers: 8
+optimizer:
+  name: "lars"
+  batch_size: 64
+  lr: 0.005
+  classifier_lr: 0.1
+  weight_decay: 1e-4
+  kwargs:
+    clip_lr: True
+    eta: 0.02
+    exclude_bias_n_norm: True
+scheduler:
+  name: "warmup_cosine"
+  warmup_epochs: 20
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 2
+auto_resume:
+  enabled: False
+
+# overwrite PL stuff
+ssl_weight: 0.3
+max_epochs: 400
+devices: [0]
+sync_batchnorm: True
+accelerator: "gpu"
+strategy: "ddp"
+precision: 16-mixed
