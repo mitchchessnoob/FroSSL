@@ -30,8 +30,8 @@ def create_optimizer_and_scheduler(model, configs):
     if configs.scheduler.name == "warmup_cosine":
         scheduler = LinearWarmupCosineAnnealingLR(
             optimizer,
-            warmup_epochs=configs.scheduler.warmup_epochs,  # You might want to add these to your config
-            max_epochs=configs.max_epochs,    # You might want to add these to your config
+            warmup_epochs=configs.scheduler.warmup_epochs, 
+            max_epochs=configs.max_epochs,   
             warmup_start_lr=0.0
         )
 
