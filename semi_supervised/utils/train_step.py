@@ -8,6 +8,7 @@ def train_step(model, labeled_loader, unlabeled_loader, optimizer, scheduler, cr
     total = 0
     correct = 0
     labeled_iter = iter(labeled_loader)
+    #since D_u should have more saples, we iterate over it accounting that D_l loader might have to restart
     for unlabeled_views in unlabeled_loader:
         try:
             x = next(labeled_iter)
@@ -18,34 +19,33 @@ def train_step(model, labeled_loader, unlabeled_loader, optimizer, scheduler, cr
 
         labeled_data, labels = x[1], x[-1]
         n_views = len(labeled_data)
-        labeled_data = torch.cat(labeled_data, dim=0)  # Shape: (32*n, 3, 224, 224)
+        labeled_data = torch.cat(labeled_data, dim=0)  # Shape: (batch_size*n_views, 3, 224, 224)
 
-        # Repeat the labels n times
+        # Repeat the labels n_views times
         labels = labels.repeat(n_views)
 
-        # Move data to device
         labeled_data = labeled_data.to(device)
-        # labeled_data = [labeled_data[i].to(device) for i in range(len(labeled_data))]
+
         labels = labels.to(device)
         views = [v.to(device) for v in unlabeled_views[1]]
 
         optimizer.zero_grad()
 
-        # Forward pass for labeled data
+        # Forward pass for labeled data to get logits
         logits = model(labeled_data)
-        # logits = [model(labeled_data[i], return_features=False) for i in range(len(labeled_data))]
-        supervised_loss = criterion(logits, labels)#np.sum(criterion(logits[i], labels) for i in range(len(logits)))
 
-        # Forward pass for unlabeled data
+        supervised_loss = criterion(logits, labels)
+
+        # Forward pass for unlabeled data to get embeddings
         features = []
         for view in views:
           feature, _ = model(view, return_features=True)
           features.append(feature)
 
-        # Calculate SSL loss
+        # Calculate SSL loss with unlabeled embeddings
         ssl_loss = multiview_frossl_loss_func(features, configs.method_kwargs.invariance_weight)
 
-        # Combined loss
+        # total loss
         loss = supervised_loss + configs.ssl_weight*ssl_loss
 
         loss.backward()
@@ -60,11 +60,11 @@ def train_step(model, labeled_loader, unlabeled_loader, optimizer, scheduler, cr
             'Train_supervised_loss_step': supervised_loss.item(),
             'Train_ssl_loss_step': ssl_loss.item()
         })
-        # predicted = [logits[i].max(1) for i in range(len(logits))]
+
         _, predicted = logits.max(1)
-        # _, predicted = logits.max(1)
+
         total += labels.size(0)
-        correct += predicted.eq(labels).sum().item()#sum([predicted[i].eq(labels).sum().item() for i in range(len(predicted))])
+        correct += predicted.eq(labels).sum().item()
 
     accuracy = 100. * correct / total
     wandb.log({
