@@ -44,7 +44,7 @@ checkpoint:
 
 
 # overwrite PL stuff
-ssl_weight: 0.3
+ssl_weight: 0.5
 max_epochs: 30
 devices: [0]
 sync_batchnorm: True
