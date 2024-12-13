@@ -122,7 +122,7 @@ def main(configs_path, augments_path):
             test_loss, test_acc = evaluate(model, test_loader, criterion, device, epoch)
 
             print(f'Epoch: {epoch+1}/{num_epochs}')
-            print(f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%'')
+            print(f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%')
             print(f'Test Loss: {test_loss:.4f}, Test Acc: {test_acc:.2f}%')
             os.makedirs(configs.checkpoint.dir, exist_ok=True)
             if test_acc > best_acc and configs.checkpoint.enabled:
