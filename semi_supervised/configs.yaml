@@ -21,9 +21,9 @@ method_kwargs:
 
 data:
   dataset: office31 # change here for cifar100
-  labeled_path: "./1/Office31/Office31_dslr"
+  labeled_path: "./1/Office31/Office31_webcam"
   unlabeled_path: "./1/Office31/Office31_amazon"
-  test_path: "./1/Office31/Office31_webcam"
+  test_path: "./1/Office31/Office31_dslr"
   num_workers: 8
 optimizer:
   name: "lars"
@@ -45,7 +45,7 @@ checkpoint:
 
 # overwrite PL stuff
 ssl_weight: 0.3
-max_epochs: 50
+max_epochs: 30
 devices: [0]
 sync_batchnorm: True
 accelerator: "gpu"
