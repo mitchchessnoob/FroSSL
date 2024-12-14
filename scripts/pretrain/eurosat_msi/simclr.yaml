@@ -11,21 +11,18 @@ hydra:
   run:
     dir: .
 
-name: "frossl-cifar10" # change here for cifar100
-method: "frossl"
+name: "simclr-eurosat" # change here for cifar100
+method: "simclr"
 backbone:
-  name: "resnet18"
+  name: "resnet50"
 method_kwargs:
   proj_hidden_dim: 2048
   proj_output_dim: 1024
-  alpha: 2
-  kernel_type: "linear"
-  invariance_weight: 1.0
-
+  temperature: 0.5
 data:
-  dataset: cifar10 # change here for cifar100
-  train_path: "./datasets"
-  val_path: "./datasets"
+  dataset: eurosat_msi # change here for cifar100
+  train_path: "./datasets/eurosat"
+  val_path: "./datasets/eurosat"
   format: "image_folder"
   num_workers: 8
 optimizer:
@@ -45,12 +42,12 @@ checkpoint:
   dir: "trained_models"
   frequency: 1
 auto_resume:
-  enabled: False
+  enabled: True
 
 # overwrite PL stuff
-max_epochs: 10 #changed
+max_epochs: 400
 devices: [0]
 sync_batchnorm: True
-accelerator: "auto" #changed
+accelerator: "gpu"
 strategy: "ddp"
-precision: 32
+precision: 16-mixed

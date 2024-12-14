@@ -1,0 +1,1 @@
+python3 -c "from solo.data.download_mit import download_mit_dataset; download_mit_dataset()"

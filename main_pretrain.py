@@ -67,6 +67,8 @@ def main(cfg: DictConfig):
     else:
         if cfg.data.format == "dali":
             val_data_format = "image_folder"
+        # elif cfg.data.dataset == "eurosat": #hh
+        #     val_data_format = "image_folder"
         else:
             val_data_format = cfg.data.format
 
@@ -119,7 +121,7 @@ def main(cfg: DictConfig):
                     build_transform_pipeline(cfg.data.dataset, aug_cfg), aug_cfg.num_crops
                 )
             )
-        transform = FullTransformPipeline(pipelines)
+        transform = FullTransformPipeline(pipelines) # apply each augmentation
 
         if cfg.debug_augmentations:
             print("Transforms:")

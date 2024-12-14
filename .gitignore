@@ -1,3 +1,12 @@
+
+!trained_models/frossl/model0312
+many_exp.sh
+pretrain_then_linear.sh
+run_comparism.sh
+run_experiment_nofrossl.sh
+run_experiment2.sh
+test_run.sh
+
 # tensorboard dir
 runs/
 
@@ -20,7 +29,8 @@ datasets
 *.ckpt
 *.tar
 *.pkl
-last_ckpt.txt
+#last_ckpt.txt
+tests.ipynb
 
 bash_files/*.png
 bash_files/*.jpg

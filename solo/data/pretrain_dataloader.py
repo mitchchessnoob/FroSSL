@@ -19,17 +19,21 @@
 
 import os
 import random
+import numpy as np
 from pathlib import Path
 from typing import Callable, List, Optional, Sequence, Type, Union
 
 import torch
 import torchvision
 from PIL import Image, ImageFilter, ImageOps
+from torchvision.transforms import ToPILImage
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torch.utils.data import DataLoader
-from torch.utils.data.dataset import Dataset
+from torch.utils.data.dataset import Dataset, Subset
 from torchvision import transforms
-from torchvision.datasets import STL10, ImageFolder
+from torchvision.datasets import STL10, ImageFolder, EuroSAT
+from datasets import load_dataset
+from scipy.ndimage import gaussian_filter
 
 try:
     from solo.data.h5_dataset import H5Dataset
@@ -55,6 +59,35 @@ def dataset_with_index(DatasetClass: Type[Dataset]) -> Type[Dataset]:
             return (index, *data)
 
     return DatasetWithIndex
+
+def eurosatdataset_with_index() -> Type[Dataset]:
+    """Factory for datasets that also returns the data index.
+
+    Args:
+        DatasetClass (Type[Dataset]): Dataset class to be wrapped.
+
+    Returns:
+        Type[Dataset]: dataset with index.
+    """
+
+    class EuroSATDatasetWithIndex(Dataset):
+        def __init__(self, hf_dataset, transform=None):
+            self.hf_dataset = hf_dataset
+            self.transform = transform
+
+        def __len__(self):
+            return len(self.hf_dataset)
+
+        def __getitem__(self, idx):
+            item = self.hf_dataset[idx]
+            image = item["image"]
+            label = item["label"]
+            
+            if self.transform:
+                image = self.transform(image)
+            return (idx, image, label)
+
+    return EuroSATDatasetWithIndex
 
 
 class CustomDatasetWithoutLabels(Dataset):
@@ -175,6 +208,18 @@ class FullTransformPipeline:
         return "\n".join(str(transform) for transform in self.transforms)
 
 
+def apply_rgb_transform(transform, x, pil=False): # specific for msi, unbatched!
+    to_pil = ToPILImage()
+    rgb = [3, 2, 1]
+    if pil:
+        x[rgb, :, :] =  transforms.ToTensor()(transform(to_pil(x[rgb, :, :])))
+    else:
+        x[rgb, :, :] =  transform(x[rgb, :, :])
+    return x
+
+def get_rgb_transfrom(transform, pil=False):
+    return transforms.Lambda(lambda x: apply_rgb_transform(transform, x, pil))
+
 def build_transform_pipeline(dataset, cfg):
     """Creates a pipeline of transformations given a dataset and an augmentation Cfg node.
     The node needs to be in the following format:
@@ -210,8 +255,10 @@ def build_transform_pipeline(dataset, cfg):
         "imagenet100": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "imagenet": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
         "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        "EuroSAT2" : ((1354.,  1115.4, 1033.3,  934.8, 1180.5, 1964.9, 2326.8, 2254.5, 1780.3, 1098.),
-                      ( 64.2, 150.7, 183.8, 272.3, 223.1, 348.6, 445.5, 519.4, 370.3, 296.9))
+        "eurosat_rgb": ((0.3127, 0.3451, 0.3703), (0.1914, 0.1270, 0.1067)),
+        "eurosat_msi": ((0.1354, 0.1118, 0.1043, 0.0948, 0.1199, 0.2000, 0.2369, 0.2297, 0.0732, 0.0012, 0.1819, 0.1119, 0.2594),
+                        (0.0246, 0.0333, 0.0395, 0.0594, 0.0566, 0.0861, 0.1087, 0.1118, 0.0405, 0.0005, 0.1003, 0.0761, 0.1232)),
+        "mit67": ((0.4887, 0.4314, 0.3724), (0.2378, 0.2332, 0.2292))
     }
 
     mean, std = MEANS_N_STD.get(
@@ -219,6 +266,10 @@ def build_transform_pipeline(dataset, cfg):
     )
 
     augmentations = []
+    if dataset[-3:] =="msi": # not an image! 
+        augmentations.append(transforms.Lambda(lambda x: x.permute(2, 0, 1)))
+        augmentations.append(transforms.Lambda(lambda x: x/10_000))
+    
     if cfg.rrc.enabled:
         augmentations.append(
             transforms.RandomResizedCrop(
@@ -234,38 +285,88 @@ def build_transform_pipeline(dataset, cfg):
                 interpolation=transforms.InterpolationMode.BICUBIC,
             ),
         )
+    
+    if dataset[-3:] !="msi": # image data
+        if cfg.color_jitter.prob:
+            augmentations.append(
+                transforms.RandomApply(
+                    [
+                        transforms.ColorJitter(
+                            cfg.color_jitter.brightness,
+                            cfg.color_jitter.contrast,
+                            cfg.color_jitter.saturation,
+                            cfg.color_jitter.hue,
+                        )
+                    ],
+                    p=cfg.color_jitter.prob,
+                ),
+            )
 
-    if cfg.color_jitter.prob:
-        augmentations.append(
-            transforms.RandomApply(
-                [
-                    transforms.ColorJitter(
-                        cfg.color_jitter.brightness,
-                        cfg.color_jitter.contrast,
-                        cfg.color_jitter.saturation,
-                        cfg.color_jitter.hue,
-                    )
-                ],
-                p=cfg.color_jitter.prob,
-            ),
-        )
+        if cfg.grayscale.prob:
+            augmentations.append(transforms.RandomGrayscale(p=cfg.grayscale.prob))
 
-    if cfg.grayscale.prob:
-        augmentations.append(transforms.RandomGrayscale(p=cfg.grayscale.prob))
+        if cfg.gaussian_blur.prob:
+            augmentations.append(transforms.RandomApply([GaussianBlur()], p=cfg.gaussian_blur.prob))
 
-    if cfg.gaussian_blur.prob:
-        augmentations.append(transforms.RandomApply([GaussianBlur()], p=cfg.gaussian_blur.prob))
+        if cfg.solarization.prob:
+            augmentations.append(transforms.RandomApply([Solarization()], p=cfg.solarization.prob))
 
-    if cfg.solarization.prob:
-        augmentations.append(transforms.RandomApply([Solarization()], p=cfg.solarization.prob))
+        if cfg.equalization.prob:
+            augmentations.append(transforms.RandomApply([Equalization()], p=cfg.equalization.prob))
 
-    if cfg.equalization.prob:
-        augmentations.append(transforms.RandomApply([Equalization()], p=cfg.equalization.prob))
+        if cfg.horizontal_flip.prob:
+            augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
 
-    if cfg.horizontal_flip.prob:
-        augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
+        augmentations.append(transforms.ToTensor())
+    else: # msi # not yet tested!!
+        if cfg.color_jitter.prob:
+            augmentations.append(
+                transforms.RandomApply(
+                    [   
+                        get_rgb_transfrom(
+                        transforms.ColorJitter(
+                            cfg.color_jitter.brightness,
+                            cfg.color_jitter.contrast,
+                            cfg.color_jitter.saturation,
+                            cfg.color_jitter.hue,
+                        )
+                        )
+                    ],
+                    p=cfg.color_jitter.prob,
+                ),
+            )
+            
+        if cfg.grayscale.prob:
+            augmentations.append(get_rgb_transfrom(transforms.RandomGrayscale(p=cfg.grayscale.prob)))
 
-    augmentations.append(transforms.ToTensor())
+        if cfg.gaussian_blur.prob:
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(GaussianBlur(), pil=True)], p=cfg.gaussian_blur.prob))
+
+        if cfg.solarization.prob:
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Solarization(), pil=True)], p=cfg.solarization.prob))
+
+        if cfg.equalization.prob:
+            augmentations.append(transforms.RandomApply([get_rgb_transfrom(Equalization(), pil=True)], p=cfg.equalization.prob))
+
+        # not rgb
+        if cfg.gaussian_filter.prob:
+            augmentations.append(transforms.RandomApply([transforms.Lambda(lambda x: torch.tensor(gaussian_filter(x, cfg.gaussian_filter.sigma)))], p=cfg.gaussian_filter.prob))
+
+        if cfg.noise.sigma:
+            augmentations.append(transforms.Lambda(lambda x: x + torch.rand(x.shape)*torch.tensor(std).reshape(13, 1, 1)*cfg.noise.sigma))#x.std(dim=(1, 2))
+
+        if cfg.rotation.max:
+            augmentations.append(transforms.RandomRotation(degrees=cfg.rotation.max))
+
+        if cfg.perspective.prob:
+            augmentations.append(transforms.RandomPerspective(distortion_scale=cfg.perspective.distortion, p=cfg.perspective.prob))
+        
+        if cfg.horizontal_flip.prob:
+            augmentations.append(transforms.RandomHorizontalFlip(p=cfg.horizontal_flip.prob))
+        
+        if cfg.vertical_flip.prob:
+            augmentations.append(transforms.RandomVerticalFlip(p=cfg.vertical_flip.prob))
+        
     augmentations.append(transforms.Normalize(mean=mean, std=std))
 
     augmentations = transforms.Compose(augmentations)
@@ -338,6 +439,21 @@ def prepare_datasets(
             download=download,
             transform=transform,
         )
+        
+    elif dataset[:7] == "eurosat":
+        if dataset[7:] == "_rgb":
+            train_dataset = load_dataset("blanchon/EuroSAT_RGB", split="train")
+        elif dataset[7:] == "_msi":
+            train_dataset = load_dataset("blanchon/EuroSAT_MSI", split="train")
+            train_dataset.set_format("torch", columns=["image", "label"])
+        else:
+            pass
+        train_dataset = eurosatdataset_with_index()(train_dataset, transform)
+    
+    elif dataset=="mit67":
+        # ImageFolder lädt das Dataset automatisch basierend auf der Ordnerstruktur
+        train_dataset = dataset_with_index(ImageFolder)(root=train_data_path, transform=transform)
+
 
     elif dataset in ["imagenet", "imagenet100", "tiny-imagenet"]:
         if data_format == "h5":
@@ -351,10 +467,9 @@ def prepare_datasets(
             dataset_class = CustomDatasetWithoutLabels
         else:
             dataset_class = ImageFolder
-
         train_dataset = dataset_with_index(dataset_class)(train_data_path, transform)
 
-    if data_fraction > 0:
+    if data_fraction > 0: #TODO adapt for eurosat
         assert data_fraction < 1, "Only use data_fraction for values smaller than 1."
         from sklearn.model_selection import train_test_split
 
@@ -388,11 +503,10 @@ def prepare_dataloader(
     Returns:
         DataLoader: the training dataloader with the desired dataset.
     """
-
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
-        shuffle=shuffle,
+        shuffle=shuffle, #TODO causes weird error
         num_workers=num_workers,
         pin_memory=True,
         drop_last=True,
