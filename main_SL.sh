@@ -1,7 +1,7 @@
 echo "run frossl SemiSL experiment."
 
 export KAGGLE_USERNAME="michelenarese"
-export KAGGLE_KEY="0a593cdaf1707de5e0924de7be17019a"
+export KAGGLE_KEY=#CENSORED
 
 CONFIGS_PATH=semi_supervised/configs.yaml
 AUGMENTS_PATH=semi_supervised/asymmetric.yaml
