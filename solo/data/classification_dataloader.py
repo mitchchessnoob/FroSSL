@@ -123,7 +123,54 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
     Returns:
         Tuple[nn.Module, nn.Module]: training and validation transformation pipelines.
     """
-
+    office_home_pipeline = {
+        "T_train": transforms.Compose(
+            [
+                transforms.Resize([256, 256]),
+                transforms.RandomCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=(0.485, 0.456, 0.406),
+                    std=(0.229, 0.224, 0.225),
+                    ),
+            ]
+        ),
+        "T_val": transforms.Compose(
+            [
+                transforms.Resize([224, 224]),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=(0.485, 0.456, 0.406),
+                    std=(0.229, 0.224, 0.225),
+                    ),
+            ]
+        ),
+    }
+    office31_pipeline = {
+        "T_train": transforms.Compose(
+            [
+                transforms.Resize([256, 256]),
+                transforms.RandomCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=(0.48145466, 0.4578275, 0.40821073),
+                    std=(0.26862954, 0.26130258, 0.27577711),
+                    ),
+            ]
+        ),
+        "T_val": transforms.Compose(
+            [
+                transforms.Resize([224, 224]),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=(0.48145466, 0.4578275, 0.40821073),
+                    std=(0.26862954, 0.26130258, 0.27577711),
+                ),
+            ]
+        ),
+    }
     cifar_pipeline = {
         "T_train": transforms.Compose(
             [
@@ -267,6 +314,8 @@ def prepare_transforms(dataset: str) -> Tuple[nn.Module, nn.Module]:
         "imagenet": imagenet_pipeline,
         "tiny-imagenet": tiny_imagenet_pipeline,
         "custom": custom_pipeline,
+        "office31": office31_pipeline,
+        "office_home":office_home_pipeline,
         "eurosat_rgb": eurosat_rgb_pipeline,
         "eurosat_msi": eurosat_msi_pipeline,
         "mit67": mit67_pipeline
@@ -323,9 +372,13 @@ def prepare_datasets(
         sandbox_folder = Path(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         val_data_path = sandbox_folder / "datasets"
 
-    assert dataset in ["cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat_rgb", "eurosat_msi", "mit67"]
+    assert dataset in ["office_home", "office31", "cifar10", "cifar100", "stl10", "imagenet", "imagenet100", "tiny-imagenet", "custom", "eurosat_rgb", "eurosat_msi", "mit67"]
 
-    if dataset in ["cifar10", "cifar100"]:
+    if dataset in ["office31", "office_home"]:
+        train_dataset = ImageFolder(train_data_path, transform=T_train)
+        val_dataset = ImageFolder(val_data_path, transform=T_val)
+        
+    elif dataset in ["cifar10", "cifar100"]:
         DatasetClass = vars(torchvision.datasets)[dataset.upper()]
         train_dataset = DatasetClass(
             train_data_path,

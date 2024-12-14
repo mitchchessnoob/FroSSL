@@ -22,6 +22,8 @@ _N_CLASSES_PER_DATASET = {
     "imagenet": 1000,
     "imagenet100": 100,
     "tiny-imagenet": 200,
+    "office31":31,
+    "office_home":65,
     "eurosat_rgb":10,
     "eurosat_msi":10,
     "mit67":67
@@ -36,6 +38,8 @@ _SUPPORTED_DATASETS = [
     "imagenet100",
     "tiny-imagenet",
     "custom",
+    "office31",
+    "office_home",
     "eurosat_rgb",
     "eurosat_msi",
     "mit67"
