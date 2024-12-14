@@ -26,10 +26,10 @@ data:
   train_path: "./datasets/mit67/train_images"
   val_path: "./datasets/mit67/test_images"
   format: "image_folder"
-  num_workers: 4
+  num_workers: 8
 optimizer:
   name: "adam"
-  batch_size: 128
+  batch_size: 64
   lr: 0.001
   weight_decay: 0
 scheduler:

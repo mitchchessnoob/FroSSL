@@ -27,10 +27,10 @@ data:
   train_path: "./datasets/mit67/train_images"
   val_path: "./datasets/mit67/test_images"
   format: "image_folder"
-  num_workers: 4
+  num_workers: 8
 optimizer:
   name: "lars"
-  batch_size: 128
+  batch_size: 64
   lr: 0.3
   classifier_lr: 0.1
   weight_decay: 1e-4

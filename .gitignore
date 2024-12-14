@@ -1,5 +1,11 @@
 
 !trained_models/frossl/model0312
+many_exp.sh
+pretrain_then_linear.sh
+run_comparism.sh
+run_experiment_nofrossl.sh
+run_experiment2.sh
+test_run.sh
 
 # tensorboard dir
 runs/
