@@ -43,5 +43,7 @@ Further if you wan to use the MIT67-dataset:
 - configure experiment by adapting the run_experiment.sh file. the CONFIG_NAME variable refers to two yaml files
   - scripts/pretrain/DATASET/CONFIG_NAME.yaml
   - scripts/linear/DATASET/CONFIG_NAME.yaml. \
- In those files the hyperparameters are defined. The pretrain conifguration further refers to a augmentation configuration.
+ In those files the hyperparameters are defined. The pretrain conifguration further refers to an augmentation configuration.
 - finally, `sh run_experiment.sh`
+
+### domain adaption
