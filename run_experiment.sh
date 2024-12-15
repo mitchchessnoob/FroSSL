@@ -1,10 +1,10 @@
-echo "run frossl experiment."
 
 EXPERIMENT_NAME="eurosat_rotation45"
 DATASET="eurosat_msi"
 BACKBONE="resnet50" 
 CONFIG_NAME="frossl_hat"
 
+echo "run $CONFIG_NAME experiment with $DATASET."
 
 python3 -u main_pretrain.py \
     --config-path "scripts/pretrain/eurosat_msi" \
