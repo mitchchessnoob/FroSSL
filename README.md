@@ -11,6 +11,7 @@ We adapt the official implementation for different tasks, see below.
   year={2024}
 }
 ```
+
 ## Tasks
 
 ### Classification of Satelite footage
@@ -25,3 +26,22 @@ The authors of the FroSSL paper applied their method to object oriented classifi
 ```
 
 ### Domain Adaption
+
+
+
+## how to run an experiment
+### setup
+```
+git clone -b main https://github.com/mitchchessnoob/FroSSL
+cd FroSSL
+pip install -r requirements.txt
+wandb login 
+```
+Further if you wan to use the MIT67-dataset:
+`sh install_mit67.sh`
+### scene classification
+- configure experiment by adapting the run_experiment.sh file. the CONFIG_NAME variable refers to two yaml files
+  - scripts/pretrain/DATASET/CONFIG_NAME.yaml
+  - scripts/linear/DATASET/CONFIG_NAME.yaml. \
+ In those files the hyperparameters are defined. The pretrain conifguration further refers to a augmentation configuration.
+- finally, `sh run_experiment.sh`
