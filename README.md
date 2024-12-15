@@ -14,7 +14,7 @@ We adapt the official implementation for different tasks, see below.
 ## Tasks
 
 ### Classification of Satelite footage
-In contrast to the initial datasets (cifar, imagenet and stl10), the EuroSAT MSI dataset consists of 13 channels.
+The authors of the FroSSL paper applied their method to object oriented classification with datasets like cifar, imagenet and stl10. In our experiments we tested the method in scene classificaiton with the EuroSAT dataset, containing 64x64x13 satelite images with 10 different classes.
 ```
 @article{helber2017eurosat,
    title={EuroSAT: A Novel Dataset and Deep Learning Benchmark for Land Use and Land Cover Classification},
