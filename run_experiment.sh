@@ -7,7 +7,7 @@ CONFIG_NAME="frossl_hat"
 echo "run $CONFIG_NAME experiment with $DATASET."
 
 python3 -u main_pretrain.py \
-    --config-path "scripts/pretrain/eurosat_msi" \
+    --config-path "scripts/pretrain/$DATASET" \
     --config-name "$CONFIG_NAME" \
     ++name="$EXPERIMENT_NAME-pretrain" \
     ++backbone.name="$BACKBONE"  \
