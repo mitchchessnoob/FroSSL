@@ -56,16 +56,16 @@ Further if you wan to use the MIT67-dataset:
 - finally, `sh run_experiment.sh`
 
 ### domain adaption
-configure experiment by adapting the main_SL.sh file:
+-Configure experiment by adapting the main_SL.sh file:
   - CONFIGS_PATH variable refers to a yaml file at semi_supervised/configs.yaml that contains all settings regarding the method, dataset path, hyperparameters, ...
   - AUGMENTS_PATH variable refers to a yaml file at semi_supervised/asymmetric.yaml that contains all augmentation parameters for labeled and unlabeled sets
   - INSERT you kaggle credentials if you want to download datasets from kaggle.
   - It's assumed that the three datasets are in the directories specified in CONFIGS_PATH, the code automatically downloads office31 dataset, change the function **dataset()** in semi_supervised/utils/dataset_download.py for training on a different dataset.
   - It is assumed that labeled and test sets are image folders, while unlabeled dataset has to be a flat directory (if it's an image folder the code automatically transforms it in the required shape)
   - In semi_supervised/utils/model.py you can change the backbone or set it to pretrained = False
+  - finally, `sh main_SL.sh` \\
 
-   - finally, `sh main_SL.sh`
-If you want to train a supervised model, use main_SL_std.sh
+-If you want to train a supervised model, use main_SL_std.sh
    - It works the same way as the standard experiments
    - The only difference is that the augmentation pipeline is inside the main function main_SL_morestandard.py
    - finally, `sh main_SL_std.sh`
