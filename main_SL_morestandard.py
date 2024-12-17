@@ -31,16 +31,13 @@ from omegaconf import OmegaConf
 import wandb
 import numpy as np
 
-def main(configs_path, augments_path):
+def main(configs_path):
     try:
         cfg = OmegaConf.load(configs_path)
         configs = parse_cfg(cfg)
 
-        with open(augments_path, "r") as f:
-          yaml_data = f.read()
         dataset()
         
-        augments = OmegaConf.create(yaml_data)
         
         # Initialize wandb
         wandb.init(project=configs.name, name=f"SemiSL without FroSSL and standard training-pretrained-D/A")
@@ -141,7 +138,6 @@ def main(configs_path, augments_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run semi-supervised training.")
     parser.add_argument("--config_path", type=str, required=True, help="Path to the configuration file.")
-    parser.add_argument("--augments_path", type=str, required=True, help="Path to the augmentations file.")
     
     args = parser.parse_args()
-    main(args.config_path, args.augments_path)
+    main(args.config_path)
