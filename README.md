@@ -26,9 +26,18 @@ The authors of the FroSSL paper applied their method to object oriented classifi
 ```
 
 ### Domain Adaption
-
-
-
+For this task we trained in a Semi-Supervised Learning framework a model that handles labeled and unlabeled data coming from different domains. The unlabeled loss is represented by FroSSL objective. We then evaluate our model on samples coming from an unseen distribution during trainig. Our work has been inspired by
+```
+@misc{liang2024generalizedsemisupervisedlearningselfsupervised,
+      title={Generalized Semi-Supervised Learning via Self-Supervised Feature Adaptation}, 
+      author={Jiachen Liang and Ruibing Hou and Hong Chang and Bingpeng Ma and Shiguang Shan and Xilin Chen},
+      year={2024},
+      eprint={2405.20596},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2405.20596}, 
+}
+```
 ## how to run an experiment
 ### setup
 ```
@@ -47,3 +56,16 @@ Further if you wan to use the MIT67-dataset:
 - finally, `sh run_experiment.sh`
 
 ### domain adaption
+configure experiment by adapting the main_SL.sh file:
+  - CONFIGS_PATH variable refers to a yaml file at semi_supervised/configs.yaml that contains all settings regarding the method, dataset path, hyperparameters, ...
+  - AUGMENTS_PATH variable refers to a yaml file at semi_supervised/asymmetric.yaml that contains all augmentation parameters for labeled and unlabeled sets
+  - INSERT you kaggle credentials if you want to download datasets from kaggle.
+  - It's assumed that the three datasets are in the directories specified in CONFIGS_PATH, the code automatically downloads office31 dataset, change the function **dataset()** in semi_supervised/utils/dataset_download.py for training on a different dataset.
+  - It is assumed that labeled and test sets are image folders, while unlabeled dataset has to be a flat directory (if it's an image folder the code automatically transforms it in the required shape)
+  - In semi_supervised/utils/model.py you can change the backbone or set it to pretrained = False
+
+   - finally, `sh main_SL.sh`
+If you want to train a supervised model, use main_SL_std.sh
+   - It works the same way as the standard experiments
+   - The only difference is that the augmentation pipeline is inside the main function main_SL_morestandard.py
+   - finally, `sh main_SL_std.sh`
