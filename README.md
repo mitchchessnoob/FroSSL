@@ -1,10 +1,12 @@
+The full technical report for this project can be accessed here:
+
+[📄 View Full Report (PDF)](FULL%20REPORT/DL_advanced_Report.pdf)
+
 # Experiments with FroSSL (Frobenius Norm Minimization for Efficient Multiview Self-Supervised Learning)
 
 This is Project is build up on a fork of the official PyTorch [implementation](https://github.com/OFSkean/FroSSL) of the [FroSSL paper](https://arxiv.org/pdf/2310.02903), which started as a fork of the fantastic [solo-learn](https://github.com/vturrisi/solo-learn.git) library.
 We adapt the official implementation for different tasks, see below.
-The full technical report for this project can be accessed here:
 
-[📄 View Full Report (PDF)](FULL%20REPORT/DL_advanced_Report.pdf)
 
 ```
 @inproceedings{skean2024frossl,
